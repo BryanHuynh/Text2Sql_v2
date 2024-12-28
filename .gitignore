@@ -2,7 +2,6 @@
 cuda
 results
 spider_data
-config.yml
 fine_tuned_t5_sql
 settings.json
 __pycache__

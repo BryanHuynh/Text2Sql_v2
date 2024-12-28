@@ -1,0 +1,12 @@
+fine_tuned_model_directory: './fine_tuned_t5_sql'
+logging_file: './Logs/logging.log'
+spider_training_dataset: "./spider_data/train_spider.json"
+spider_training_tables_dataset: "./spider_data/tables.json"
+spider_validation_dataset: "./spider_data/train_spider.json"
+spider_validation_tables_dataset: "./spider_data/tables.json"
+pretrained_source_model: "google/flan-t5-small"
+model_save_location: "./fine_tuned_t5_sql"
+
+evaluation_steps: 250
+logging_steps: 250
+batch_size: 8
