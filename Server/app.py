@@ -2,11 +2,14 @@ from flask import Flask, request, jsonify
 from model_query import query_model
 import logging
 import yaml
+import os
 
 
 app = Flask(__name__)
 config = yaml.safe_load(open("./config.yml"))
 logger = logging.getLogger(__name__)
+host = config['host']
+port = config['port']
 
 @app.route('/data', methods=['GET'])
 def get_model_response():
@@ -33,11 +36,15 @@ def get_model_response():
 
 if __name__ == '__main__':
     print(config['logging_file'])
+    log_file_path = config['logging_file']
+    log_dir = os.path.dirname(log_file_path)
+    if log_dir and not os.path.exists(log_dir): # Check if log_dir is not empty and if it exists
+        os.makedirs(log_dir, exist_ok=True) # Create directory if it doesn't exist
     logging.basicConfig(
-        filename=config['logging_file'], 
+        filename=log_file_path, 
         level=logging.INFO,
         format='%(asctime)s %(levelname)s %(message)s',
         datefmt="%Y-%m-%d %H:%M:%S"
         )
-    logger.info("started")
-    app.run()
+    logger.info(f"started flash on host: {host}, port: {port}")
+    app.run(host=host, port=port)

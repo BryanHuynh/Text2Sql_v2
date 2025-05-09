@@ -6,3 +6,4 @@ fine_tuned_t5_sql
 settings.json
 __pycache__
 Logs
+Server/.venv
