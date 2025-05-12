@@ -3,7 +3,10 @@ cuda
 results
 spider_data
 fine_tuned_t5_sql
+fine_tuned__flan_t5_sql
+fine_tuned_flan_t5_sql
 settings.json
+models
 __pycache__
 Logs
 Server/.venv

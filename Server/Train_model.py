@@ -1,3 +1,4 @@
+import datetime
 import os
 from transformers import T5Tokenizer, T5ForConditionalGeneration, T5Model
 from transformers import Seq2SeqTrainer, Seq2SeqTrainingArguments, DataCollatorForSeq2Seq, Trainer
@@ -24,17 +25,18 @@ def load_data(filepath):
     with open(filepath) as json_file:
         return json.load(json_file)
 
-train_data = load_data(config['spider_training_dataset'])
-train_tables_data = load_data(config['spider_training_tables_dataset'])
-random.shuffle(train_data)
+dataset_1 = load_data(config['spider_training_dataset'])
+dataset_1_tables = load_data(config['spider_training_tables_dataset'])
 
-validation_data = load_data(config['spider_validation_dataset'])
-validation_tables_data = load_data(config['spider_validation_tables_dataset'])
-random.shuffle(validation_data)
 
-test_data = load_data(config['spider_test_dataset'])
-test_tables_data = load_data(config['spider_test_tables_dataset'])
+dataset_2 = load_data(config['spider_validation_dataset'])
+dataset_2_tables = load_data(config['spider_validation_tables_dataset'])
 
+dataset_3 = load_data(config['spider_test_dataset'])
+dataset_3_tables = load_data(config['spider_test_tables_dataset'])
+
+dataset = dataset_1 + dataset_2 + dataset_3
+tables_dataset = dataset_1_tables + dataset_2_tables + dataset_3_tables
 
 def generate_table_index(tables):
     index_dictionary = {}
@@ -42,14 +44,30 @@ def generate_table_index(tables):
         index_dictionary[table['db_id']] = index
     return index_dictionary
 
-train_table_index_dictionary = generate_table_index(train_tables_data)
-validation_table_index_dictionary = generate_table_index(validation_tables_data)
-test_table_index_dictionary = generate_table_index(test_tables_data)
+dataset_index_dictionary = generate_table_index(tables_dataset)
 
+def splitData(_dataset, training=0.7, validation=0.2, testing=0.1):
+    if(training + validation + testing > 1.0):
+        return ValueError('training, validation and testing sum > 1.0')
+    random.shuffle(_dataset)
+    training_dataset = []
+    validation_dataset = []
+    testing_dataset = []
+    dataset_size = len(_dataset)
+    for i in range(dataset_size):
+        if i < training * float(dataset_size):
+            training_dataset.append(_dataset[i])
+        elif i < (training + validation) * float(dataset_size):
+            validation_dataset.append(_dataset[i])
+        else:
+            testing_dataset.append(_dataset[i])
+    return training_dataset, validation_dataset, testing_dataset
 
+train_data, validation_data, test_data = splitData(dataset)
+            
 
 def parse_table(db_id, tables, table_index_dictionary):
-    table = tables[table_index_dictionary[db_id]]
+    table = tables[table_index_dictionary[db_id]]       
     table_names = []
     column = {}
     ret_string = ""
@@ -80,7 +98,7 @@ tokenizer = T5Tokenizer.from_pretrained(config['pretrained_source_model'])
 def preprocess_data(examples):
     inputs = [item for item in examples['input']]
     
-    model_inputs = tokenizer(inputs, max_length=900, truncation=True, padding=True, return_tensors="pt")
+    model_inputs = tokenizer(inputs, max_length=1024, truncation=True, padding=True, return_tensors="pt")
     
     targets = [item for item in examples['target']]
     with tokenizer.as_target_tokenizer():
@@ -89,9 +107,9 @@ def preprocess_data(examples):
     model_inputs["labels"] = labels["input_ids"]
     return model_inputs
 
-raw_training_data = [parse(train_data[i], train_tables_data, train_table_index_dictionary) for i in range(len(train_data))]
-raw_validationing_data = [parse(validation_data[i], validation_tables_data, validation_table_index_dictionary) for i in range(len(validation_data))]
-raw_testing_data = [parse(test_data[i], test_tables_data, test_table_index_dictionary) for i in range(len(test_data))]
+raw_training_data = [parse(train_data[i], tables_dataset, dataset_index_dictionary) for i in range(len(train_data))]
+raw_validationing_data = [parse(validation_data[i], tables_dataset, dataset_index_dictionary) for i in range(len(validation_data))]
+raw_testing_data = [parse(test_data[i], tables_dataset, dataset_index_dictionary) for i in range(len(test_data))]
 
 training_dataset = Dataset.from_list(raw_training_data)
 validationing_dataset = Dataset.from_list(raw_validationing_data)
@@ -144,7 +162,7 @@ trainer.train()
 test_output = trainer.evaluate(encoded_dataset['test'])
 print(test_output)
 
-# # Save the model
+# Save the model
 model.save_pretrained(config['model_save_location'])
 tokenizer.save_pretrained(config['model_save_location'])
 
@@ -177,6 +195,6 @@ plt.ylim(bottom=0, top=1.0) # Clip y-axis: show 0 to 1.0
 plt.legend()
 plt.grid(True)
 
-plot_path = os.path.join(training_args.output_dir, "loss_plot.png")
+plot_path = os.path.join(training_args.output_dir, f"loss_plot_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png")
 plt.savefig(plot_path)
 print(f"Loss plot saved to {plot_path}")
