@@ -1,30 +1,37 @@
 "use client";
-import { Key, useEffect, useRef, useState } from "react";
+import { Key, useCallback, useEffect, useRef, useState } from "react";
 import FieldInput from "./FieldInput";
 import Image from "next/image";
 
 interface TableInputFormProps {
   id: Key;
   onRemoveTable: (id: Key) => void;
+  onRequestTable: (index: number, callback: () => string) => void;
 }
 
-const TableInputForm: React.FC<TableInputFormProps> = ({ id, onRemoveTable }) => {
+const TableInputForm: React.FC<TableInputFormProps> = ({
+  id,
+  onRemoveTable,
+  onRequestTable,
+}) => {
   const [tableName, setTableName] = useState<string>("");
   const [fieldInputs, setFieldInputs] = useState<number[]>([]);
-  const callbackRefs = useRef<(() => void)[]>([]);
+  const callbackRefs = useRef<(() => string)[]>([]);
   const fieldInputCount = useRef(0);
-
 
   useEffect(() => {
     addFieldInput();
   }, []);
-  
+
+  useEffect(() => {
+    onRequestTable(id as number, getFields);
+  },[id, onRequestTable, tableName])
+
   const addFieldInput = () => {
     const index: number = fieldInputCount.current;
     setFieldInputs([...fieldInputs, index]);
     fieldInputCount.current++;
   };
-
 
   const registerCallback = (index: number, callback: () => string) => {
     callbackRefs.current[index] = callback;
@@ -34,23 +41,23 @@ const TableInputForm: React.FC<TableInputFormProps> = ({ id, onRemoveTable }) =>
     setFieldInputs(fieldInputs.filter((i) => i !== index));
   };
 
-  const logFields = () => {
+  const getFields = useCallback((): string => {
     const results = callbackRefs.current.map((cb, i) => {
-      if (typeof cb === "function" && fieldInputs.includes(i)) {
+      if (typeof cb === "function") {
         return cb();
       }
       return null;
     });
-    console.log(results);
-    console.log(
-      `TABLE ${tableName} (${results
-        .filter((result) => result)
-        .join(",")});`
-    );
-  };
+    console.log(tableName)
+    return `TABLE ${tableName} (${results
+      .filter((result) => result)
+      .join(",")});`;
+  }, [tableName]);
 
   return (
-    <form className="border-white border-2 p-3 space-y-3 rounded-md relative"> {/* Added rounded-md and relative */}
+    <form className="border-white border-2 p-3 space-y-3 rounded-md relative">
+      {" "}
+      {/* Added rounded-md and relative */}
       <button
         type="button" // Important to prevent form submission
         onClick={() => onRemoveTable(id)}
@@ -59,14 +66,18 @@ const TableInputForm: React.FC<TableInputFormProps> = ({ id, onRemoveTable }) =>
       >
         <Image
           src="/cross.svg" // Assuming you have a cross icon, or use text
-          className="dark:invert"
+          className="dark:invert "
           alt="Remove Table Icon"
           width={16} // Adjusted size
           height={16}
         />
       </button>
-      <div className="flex items-center mt-4"> {/* Added mt-4 to avoid overlap with remove button */}
-        <label className="sm:text-base font-medium text-white mr-2"> {/* Changed text-white-900 to text-white */}
+      <div className="flex items-center mt-4">
+        {" "}
+        {/* Added mt-4 to avoid overlap with remove button */}
+        <label className="sm:text-base font-medium text-white mr-2">
+          {" "}
+          {/* Changed text-white-900 to text-white */}
           Table Name:
         </label>
         <input
@@ -84,7 +95,12 @@ const TableInputForm: React.FC<TableInputFormProps> = ({ id, onRemoveTable }) =>
           onRemove={removeFieldInput}
         />
       ))}
-      <div className="w-full bg-gray-500 rounded p-1 flex justify-center items-center hover:bg-gray-600 cursor-pointer" onClick={addFieldInput}> {/* Added cursor-pointer */}
+      <div
+        className="w-full bg-gray-500 rounded p-1 flex justify-center items-center hover:bg-gray-600 cursor-pointer"
+        onClick={addFieldInput}
+      >
+        {" "}
+        {/* Added cursor-pointer */}
         <Image
           src="/add.svg"
           className="dark:invert"
@@ -97,7 +113,7 @@ const TableInputForm: React.FC<TableInputFormProps> = ({ id, onRemoveTable }) =>
         className="w-full bg-sky-600 hover:bg-sky-700 rounded p-1 text-white transition-colors" // Changed color for better distinction
         onClick={(e) => {
           e.preventDefault();
-          logFields();
+          getFields();
         }}
       >
         Submit
