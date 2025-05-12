@@ -8,12 +8,19 @@ interface TableInputFormProps {
   id: Key;
   onRemoveTable: (id: Key) => void;
   onRequestTable: (index: number, callback: () => string) => void;
+  uploadTableFormProps?: UploadTableFormProps;
+}
+
+interface UploadTableFormProps {
+  title?: string,
+  fieldNames?: string[]
 }
 
 const TableInputForm: React.FC<TableInputFormProps> = ({
   id,
   onRemoveTable,
   onRequestTable,
+  uploadTableFormProps,
 }) => {
   const [tableName, setTableName] = useState<string>("");
   const [fieldInputs, setFieldInputs] = useState<number[]>([]);
@@ -22,6 +29,16 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
 
   useEffect(() => {
     addFieldInput();
+    if (uploadTableFormProps) {
+      if (uploadTableFormProps.title) {
+        setTableName(uploadTableFormProps.title);
+      }
+      if (uploadTableFormProps.fieldNames) {
+        uploadTableFormProps.fieldNames.forEach(() => {
+          addFieldInput();
+        });
+      }
+    }
   }, []);
 
   useEffect(() => {

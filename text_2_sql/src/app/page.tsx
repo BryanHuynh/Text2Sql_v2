@@ -35,8 +35,7 @@ export default function Home() {
     });
     console.log(question);
     console.log(results);
-  }
-
+  };
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -62,7 +61,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex flex-row items-center justify-baseline gap-2 max-w-xl">
-          <QuestionField onAskPressed={getTableDetails}/>
+          <QuestionField onAskPressed={getTableDetails} />
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center"></footer>
