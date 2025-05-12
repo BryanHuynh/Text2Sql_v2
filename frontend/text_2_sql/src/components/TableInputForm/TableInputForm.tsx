@@ -2,6 +2,7 @@
 import { Key, useCallback, useEffect, useRef, useState } from "react";
 import FieldInput from "./FieldInput";
 import Image from "next/image";
+import { Field, Fieldset, Legend } from "@headlessui/react";
 
 interface TableInputFormProps {
   id: Key;
@@ -25,7 +26,7 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
 
   useEffect(() => {
     onRequestTable(id as number, getFields);
-  },[id, onRequestTable, tableName])
+  }, [id, onRequestTable, tableName]);
 
   const addFieldInput = () => {
     const index: number = fieldInputCount.current;
@@ -48,16 +49,15 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
       }
       return null;
     });
-    console.log(tableName)
+    console.log(tableName);
     return `TABLE ${tableName} (${results
       .filter((result) => result)
       .join(",")});`;
   }, [tableName]);
 
   return (
-    <form className="border-white border-2 p-3 space-y-3 rounded-md relative">
-      {" "}
-      {/* Added rounded-md and relative */}
+    <Fieldset className="border-white border-2 p-3 space-y-3 rounded-md relative">
+      <Legend className="text-lg font-bold">Database Table {id}</Legend>
       <button
         type="button" // Important to prevent form submission
         onClick={() => onRemoveTable(id)}
@@ -73,19 +73,17 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
         />
       </button>
       <div className="flex items-center mt-4">
-        {" "}
-        {/* Added mt-4 to avoid overlap with remove button */}
-        <label className="sm:text-base font-medium text-white mr-2">
-          {" "}
-          {/* Changed text-white-900 to text-white */}
-          Table Name:
-        </label>
-        <input
-          type="text"
-          className="p-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-base flex-grow text-black"
-          value={tableName}
-          onChange={(e) => setTableName(e.target.value)}
-        />
+        <Field>
+          <label className="sm:text-base font-medium text-white mr-2">
+            Table Name:
+          </label>
+          <input
+            type="text"
+            className="p-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-base flex-grow text-black"
+            value={tableName}
+            onChange={(e) => setTableName(e.target.value)}
+          />
+        </Field>
       </div>
       {fieldInputs.map((index) => (
         <FieldInput
@@ -109,7 +107,7 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
           height={10}
         />
       </div>
-      <button
+      {/* <button
         className="w-full bg-sky-600 hover:bg-sky-700 rounded p-1 text-white transition-colors" // Changed color for better distinction
         onClick={(e) => {
           e.preventDefault();
@@ -117,8 +115,8 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
         }}
       >
         Submit
-      </button>
-    </form>
+      </button> */}
+    </Fieldset>
   );
 };
 

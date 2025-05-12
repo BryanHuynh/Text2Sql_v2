@@ -3,7 +3,6 @@ import { useState, Key, useRef } from "react"; // Import useState and Key
 import QuestionField from "@/components/questionField/QuestionField";
 import TableInputForm from "@/components/TableInputForm/TableInputForm";
 import { Field, Label } from "@headlessui/react";
-import { get } from "http";
 
 export default function Home() {
   // State to manage the list of table forms. Each item can be a unique key.
@@ -27,13 +26,14 @@ export default function Home() {
     callbackRefs.current[index] = callback;
   };
 
-  const getTableDetails = () => {
+  const getTableDetails = (question: string) => {
     const results = callbackRefs.current.map((cb, i) => {
       if (typeof cb === "function" && tableForms.includes(i)) {
         return cb();
       }
       return null;
     });
+    console.log(question);
     console.log(results);
   }
 
