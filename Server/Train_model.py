@@ -83,6 +83,7 @@ def parse_table(db_id, tables, table_index_dictionary):
         ret_string += f"TABLE {table} ("
         ret_string += ' ,'.join(column[table])
         ret_string += '); '
+        # remove spaces and replace with underscore for fields
     return ret_string
 
 def parse(entry, tables, table_index_dictionary):

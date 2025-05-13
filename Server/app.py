@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from model_query import query_model
 import logging
 import yaml
@@ -6,12 +7,13 @@ import os
 
 
 app = Flask(__name__)
+CORS(app)
 config = yaml.safe_load(open("./config.yml"))
 logger = logging.getLogger(__name__)
 host = config['host']
 port = config['port']
 
-@app.route('/data', methods=['GET'])
+@app.route('/data', methods=['POST'])
 def get_model_response():
     body = request.get_json()
 

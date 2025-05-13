@@ -1,4 +1,4 @@
-fine_tuned_model_directory: './fine_tuned_flan_t5_sql'
+fine_tuned_model_directory: './models/fine_tuned_flan_t5_sql'
 logging_file: './Logs/logging.log'
 spider_training_dataset: "./spider_data/train_spider.json"
 spider_training_tables_dataset: "./spider_data/tables.json"
@@ -7,7 +7,7 @@ spider_validation_tables_dataset: "./spider_data/tables.json"
 spider_test_dataset: "./spider_data/test.json"
 spider_test_tables_dataset: "./spider_data/test_tables.json"
 pretrained_source_model: "google/flan-t5-base"
-model_save_location: "./fine_tuned_flan_t5_sql"
+model_save_location: "./models/fine_tuned_flan_t5_sql"
 
 evaluation_steps: 200
 logging_steps: 200

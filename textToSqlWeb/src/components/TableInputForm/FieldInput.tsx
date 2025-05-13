@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import Image from "next/image";
 import { Field } from "@headlessui/react";
 interface FieldInputProps {
   index: number;
@@ -16,8 +15,15 @@ const FieldInput: React.FC<FieldInputProps> = ({
   const [fieldName, setFieldName] = useState<string>("");
 
   const callback = useCallback((): string => {
-    return fieldName;
+    return fieldName.toLowerCase();
   }, [fieldName]);
+
+  const updateFieldName = (text: string) => {
+    let value: string = text;
+    value = value.replace(/[^A-Za-z0-9_]/g, "");
+    setFieldName(value);
+  };
+
 
   useEffect(() => {
     onCallback(index, callback);
@@ -32,7 +38,7 @@ const FieldInput: React.FC<FieldInputProps> = ({
         type="text"
         className="p-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-base flex-grow text-black"
         value={fieldName}
-        onChange={(e) => setFieldName(e.target.value)}
+        onChange={(e) => updateFieldName(e.target.value)}
       ></input>
       <button
         onClick={(e) => {
@@ -40,12 +46,12 @@ const FieldInput: React.FC<FieldInputProps> = ({
           onRemove(index);
         }}
       >
-        <Image
-          src="/cross.svg"
+        <img
+          src="/public/cross.svg"
           className="dark:invert fill-current text-red-400"
           alt="Add Icon"
           color="red"
-          width={25}
+          width={20}
           height={10}
         />
       </button>

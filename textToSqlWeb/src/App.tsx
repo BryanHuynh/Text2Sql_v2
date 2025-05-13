@@ -1,10 +1,12 @@
 "use client"; // Required for useState
-import { useState, Key, useRef } from "react"; // Import useState and Key
-import QuestionField from "@/components/questionField/QuestionField";
-import TableInputForm from "@/components/TableInputForm/TableInputForm";
+import { useState, type Key, useRef } from "react"; // Import useState and Key
+import QuestionField from "./components/questionField/QuestionField";
+import TableInputForm from "./components/TableInputForm/TableInputForm";
 import { Field, Label } from "@headlessui/react";
+import { getAnswerBasedOnSchemaAndQuestion } from "./utils/get";
+import ChatBox from "./components/ChatBox/ChatBox";
 
-export default function Home() {
+export default function App() {
   // State to manage the list of table forms. Each item can be a unique key.
   const [tableForms, setTableForms] = useState<Key[]>([0]); // Start with one table form
   const [nextTableKey, setNextTableKey] = useState(1); // Counter for unique keys
@@ -35,6 +37,11 @@ export default function Home() {
     });
     console.log(question);
     console.log(results);
+    getAnswerBasedOnSchemaAndQuestion(question, results.join()).then(
+      (answer) => {
+        console.log(answer);
+      }
+    );
   };
 
   return (
@@ -60,7 +67,8 @@ export default function Home() {
             </Field>
           </div>
         </div>
-        <div className="flex flex-row items-center justify-baseline gap-2 max-w-xl">
+        <div className="flex flex-col items-center justify-baseline gap-2 max-w-xl">
+          <ChatBox />
           <QuestionField onAskPressed={getTableDetails} />
         </div>
       </main>

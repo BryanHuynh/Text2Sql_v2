@@ -1,7 +1,6 @@
 "use client";
 import { Key, useCallback, useEffect, useRef, useState } from "react";
 import FieldInput from "./FieldInput";
-import Image from "next/image";
 import { Field, Fieldset, Legend } from "@headlessui/react";
 
 interface TableInputFormProps {
@@ -12,8 +11,8 @@ interface TableInputFormProps {
 }
 
 interface UploadTableFormProps {
-  title?: string,
-  fieldNames?: string[]
+  title?: string;
+  fieldNames?: string[];
 }
 
 const TableInputForm: React.FC<TableInputFormProps> = ({
@@ -66,11 +65,16 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
       }
       return null;
     });
-    console.log(tableName);
-    return `TABLE ${tableName} (${results
+    return `TABLE ${tableName.toLowerCase()} (${results
       .filter((result) => result)
       .join(",")});`;
   }, [tableName]);
+
+  const updateTableName = (text: string) => {
+    let value: string = text;
+    value = value.replace(/[^A-Za-z0-9_]/g, "");
+    setTableName(value);
+  };
 
   return (
     <Fieldset className="border-white border-2 p-3 space-y-3 rounded-md relative">
@@ -81,8 +85,8 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
         className="absolute top-1 right-1 text-white hover:text-red-400 p-1 rounded-full transition-colors"
         aria-label="Remove table"
       >
-        <Image
-          src="/cross.svg" // Assuming you have a cross icon, or use text
+        <img
+          src="/public/cross.svg" // Assuming you have a cross icon, or use text
           className="dark:invert "
           alt="Remove Table Icon"
           width={16} // Adjusted size
@@ -98,7 +102,7 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
             type="text"
             className="p-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-base flex-grow text-black"
             value={tableName}
-            onChange={(e) => setTableName(e.target.value)}
+            onChange={(e) => updateTableName(e.target.value)}
           />
         </Field>
       </div>
@@ -116,12 +120,12 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
       >
         {" "}
         {/* Added cursor-pointer */}
-        <Image
-          src="/add.svg"
+        <img
+          src="\public\add.svg"
           className="dark:invert"
           alt="Add Icon"
           width={25}
-          height={10}
+          height={10} 
         />
       </div>
       {/* <button
