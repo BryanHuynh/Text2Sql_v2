@@ -4,13 +4,14 @@ import QuestionField from "./components/questionField/QuestionField";
 import TableInputForm from "./components/TableInputForm/TableInputForm";
 import { Field, Label } from "@headlessui/react";
 import { getAnswerBasedOnSchemaAndQuestion } from "./utils/get";
-import ChatBox from "./components/ChatBox/ChatBox";
+import ChatBox, { type ChatBoxRef, type Message } from "./components/ChatBox/ChatBox";
 
 export default function App() {
   // State to manage the list of table forms. Each item can be a unique key.
   const [tableForms, setTableForms] = useState<Key[]>([0]); // Start with one table form
   const [nextTableKey, setNextTableKey] = useState(1); // Counter for unique keys
   const callbackRefs = useRef<(() => string)[]>([]);
+  const chatBoxRef = useRef<ChatBoxRef>(null);
 
   const handleAddNewTable = () => {
     setTableForms((prevForms) => [...prevForms, nextTableKey]);
@@ -28,6 +29,11 @@ export default function App() {
     callbackRefs.current[index] = callback;
   };
 
+  const handleUpdateChatBox = (message: Message) => {
+    chatBoxRef.current?.updateMessages(message);
+  };
+
+
   const getTableDetails = (question: string) => {
     const results = callbackRefs.current.map((cb, i) => {
       if (typeof cb === "function" && tableForms.includes(i)) {
@@ -35,11 +41,17 @@ export default function App() {
       }
       return null;
     });
-    console.log(question);
-    console.log(results);
+    handleUpdateChatBox({
+      sender: "user",
+      text: question,
+    });
+
     getAnswerBasedOnSchemaAndQuestion(question, results.join()).then(
       (answer) => {
-        console.log(answer);
+        handleUpdateChatBox({
+          sender: "bot",
+          text: answer,
+        });
       }
     );
   };
@@ -67,8 +79,8 @@ export default function App() {
             </Field>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-baseline gap-2 max-w-xl">
-          <ChatBox />
+        <div className="flex flex-col items-center justify-baseline gap-2 w-full">
+          <ChatBox ref={chatBoxRef}/>
           <QuestionField onAskPressed={getTableDetails} />
         </div>
       </main>

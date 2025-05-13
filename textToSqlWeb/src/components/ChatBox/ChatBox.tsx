@@ -1,31 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 
-type Message = {
+export type Message = {
   sender: "user" | "bot";
   text: string;
 };
 
-const ChatBox: React.FC = () => {
+export interface ChatBoxRef {
+  updateMessages: (message: Message) => void;
+}
+
+const ChatBox: React.FC = forwardRef<ChatBoxRef>((props, ref) => {
   const [messages, setMessages] = useState<Message[]>([]);
-	
-	useEffect(() => {
-		const botMessage: Message = {
-			sender: "bot",
-			text: "Hello! How can I assist you today?",
-		}
 
-		const userMessage: Message = {
-			sender: "user",
-			text: 'Hello',
-		}
+  useImperativeHandle(ref, () => ({
+    updateMessages: (message: Message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    },
+  }));
 
-		setMessages([userMessage, botMessage])
- 
-	}, []);
-
-
+  if (messages.length == 0) return;
   return (
-    <div className="w-full max-w-md shadow-lg rounded-lg p-4 flex flex-col h-[600px]">
+    <div className="w-full max-w-1/2 shadow-lg rounded-lg p-4 flex flex-col h-[600px]">
       <div className="flex-1 overflow-y-auto space-y-2 mb-4">
         {messages.map((msg, index) => (
           <div
@@ -48,6 +48,6 @@ const ChatBox: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 export default ChatBox;
