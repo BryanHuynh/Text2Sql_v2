@@ -3,7 +3,7 @@ import { Client } from "@gradio/client";
 export async function getAnswerBasedOnSchemaAndQuestion(
   question: string,
   schema: string
-) {
+): Promise<string> {
   const client = await Client.connect(
     "https://positive-curiously-rattler.ngrok-free.app/"
   );
@@ -12,7 +12,5 @@ export async function getAnswerBasedOnSchemaAndQuestion(
     question: question,
   });
 
-  console.log(result.data);
-
-  return result.data;
+  return result.data as string;
 }
