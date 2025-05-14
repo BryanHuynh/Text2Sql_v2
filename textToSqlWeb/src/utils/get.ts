@@ -1,19 +1,18 @@
-import axios from "axios";
+import { Client } from "@gradio/client";
 
 export async function getAnswerBasedOnSchemaAndQuestion(
   question: string,
   schema: string
 ) {
-  const body = {
-    question: question,
+  const client = await Client.connect(
+    "https://positive-curiously-rattler.ngrok-free.app/"
+  );
+  const result = await client.predict("/predict", {
     schema: schema,
-  };
-  console.log(body);
-  const response = await axios.post('/data', body, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    question: question,
   });
 
-  return response.data[0].response;
+  console.log(result.data);
+
+  return result.data;
 }
