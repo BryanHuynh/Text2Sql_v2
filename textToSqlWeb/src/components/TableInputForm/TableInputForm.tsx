@@ -1,5 +1,5 @@
 "use client";
-import { Key, useCallback, useEffect, useRef, useState } from "react";
+import { type Key, useCallback, useEffect, useRef, useState } from "react";
 import FieldInput from "./FieldInput";
 import { Field, Fieldset, Legend } from "@headlessui/react";
 
@@ -59,7 +59,7 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
   };
 
   const getFields = useCallback((): string => {
-    const results = callbackRefs.current.map((cb, i) => {
+    const results = callbackRefs.current.map((cb) => {
       if (typeof cb === "function") {
         return cb();
       }
