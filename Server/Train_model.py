@@ -91,7 +91,7 @@ def parse(entry, tables, table_index_dictionary):
     target = entry['query']
     db_id = entry['db_id']
     schema = parse_table(db_id, tables, table_index_dictionary)
-    # print(schema, question, target)
+    print(schema, question, target)
     return {'input': f"Given the following SQL Schema: {schema}. Provide a SQL query reponse for: {question}", 'target': target}
 
 tokenizer = T5Tokenizer.from_pretrained(config['pretrained_source_model'])

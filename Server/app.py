@@ -1,52 +1,39 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from model_query import query_model
-import logging
-import yaml
-import os
+import gradio as gr
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 
+def query_model(schema, question):
+    model = T5ForConditionalGeneration.from_pretrained("model")  # Path to your saved model
+    tokenizer = T5Tokenizer.from_pretrained("model")
+    return _query_model(model, tokenizer, schema, question)
 
-app = Flask(__name__)
-CORS(app)
-config = yaml.safe_load(open("./config.yml"))
-logger = logging.getLogger(__name__)
-host = config['host']
-port = config['port']
+def _query_model(model, tokenizer, schema, question):
+    sample_input =  f"Given the following SQL Schema: {schema}. Provide a SQL query reponse for: {question}"
 
-@app.route('/data', methods=['POST'])
-def get_model_response():
-    body = request.get_json()
+    input_ids = tokenizer.encode(
+        sample_input,
+        max_length=1024,           # Ensure this matches the training max_length
+        truncation=True,          # Truncate input if it's too long
+        return_tensors="pt"       # Return as PyTorch tensors
+    )
 
-    if body is None:
-        logger.error(f"no body found in request")
-        return jsonify({"error": "No Json body provided"}), 400
+    model.eval()  # Set model to evaluation mode
+    output_ids = model.generate(
+        input_ids,
+        max_length=300,           # Set max_length for the output
+        num_beams=5,              # Beam search for better results (can adjust as needed)
+        temperature=1.0,          # Adjust temperature for randomness in output
+        repetition_penalty=2.5,   # Penalize repetition
+        early_stopping=True       # Stop early if the output sequence is complete
+    )
+    output_text = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    return output_text
     
-    if body.get('schema') is None:
-        logger.error(f"no schema found in {body}")
-        return jsonify({"error": "No schema provided"}), 400
-    else:
-        schema = body['schema']
-    
-    if body.get('question') is None:
-        logger.error(f"no question found in {body}")
-        return jsonify({"error": "No question provided"}), 400
-    else:
-        question = body['question']
-    
-    return jsonify({'response': query_model(schema, question)}, 200)
-    # return jsonify('hello')
 
-if __name__ == '__main__':
-    print(config['logging_file'])
-    log_file_path = config['logging_file']
-    log_dir = os.path.dirname(log_file_path)
-    if log_dir and not os.path.exists(log_dir): # Check if log_dir is not empty and if it exists
-        os.makedirs(log_dir, exist_ok=True) # Create directory if it doesn't exist
-    logging.basicConfig(
-        filename=log_file_path, 
-        level=logging.INFO,
-        format='%(asctime)s %(levelname)s %(message)s',
-        datefmt="%Y-%m-%d %H:%M:%S"
-        )
-    logger.info(f"started flash on host: {host}, port: {port}")
-    app.run(host=host, port=port)
+
+demo = gr.Interface(fn=query_model,     
+        inputs=[
+            gr.Textbox(label="Schema"),
+            gr.Textbox(label="Question")
+            ], 
+        outputs="text")
+demo.launch(server_name="0.0.0.0", server_port=7860)

@@ -15,7 +15,7 @@ def _query_model(model, tokenizer, schema, question):
 
     input_ids = tokenizer.encode(
         sample_input,
-        max_length=512,           # Ensure this matches the training max_length
+        max_length=1024,           # Ensure this matches the training max_length
         truncation=True,          # Truncate input if it's too long
         return_tensors="pt"       # Return as PyTorch tensors
     )
@@ -23,7 +23,7 @@ def _query_model(model, tokenizer, schema, question):
     model.eval()  # Set model to evaluation mode
     output_ids = model.generate(
         input_ids,
-        max_length=128,           # Set max_length for the output
+        max_length=300,           # Set max_length for the output
         num_beams=5,              # Beam search for better results (can adjust as needed)
         temperature=1.0,          # Adjust temperature for randomness in output
         repetition_penalty=2.5,   # Penalize repetition
