@@ -4,14 +4,18 @@ import QuestionField from "./components/questionField/QuestionField";
 import TableInputForm from "./components/TableInputForm/TableInputForm";
 import { Field, Label } from "@headlessui/react";
 import { getAnswerBasedOnSchemaAndQuestion } from "./utils/get";
-import ChatBox, { type ChatBoxRef, type Message } from "./components/ChatBox/ChatBox";
+import ChatBox, {
+  type ChatBoxHandle,
+  type Message,
+} from "./components/ChatBox/ChatBox";
 
 export default function App() {
   // State to manage the list of table forms. Each item can be a unique key.
   const [tableForms, setTableForms] = useState<Key[]>([0]); // Start with one table form
   const [nextTableKey, setNextTableKey] = useState(1); // Counter for unique keys
   const callbackRefs = useRef<(() => string)[]>([]);
-  const chatBoxRef = useRef<ChatBoxRef>(null);
+  const chatBoxRef = useRef<ChatBoxHandle>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddNewTable = () => {
     setTableForms((prevForms) => [...prevForms, nextTableKey]);
@@ -33,7 +37,6 @@ export default function App() {
     chatBoxRef.current?.updateMessages(message);
   };
 
-
   const getTableDetails = (question: string) => {
     const results = callbackRefs.current.map((cb, i) => {
       if (typeof cb === "function" && tableForms.includes(i)) {
@@ -45,13 +48,15 @@ export default function App() {
       sender: "user",
       text: question,
     });
+    setIsLoading(true);
 
     getAnswerBasedOnSchemaAndQuestion(question, results.join()).then(
-      (answer) => {
+      (answer: string) => {
         handleUpdateChatBox({
           sender: "bot",
           text: answer,
         });
+        setIsLoading(false);
       }
     );
   };
@@ -80,7 +85,7 @@ export default function App() {
           </div>
         </div>
         <div className="flex flex-col items-center justify-baseline gap-2 w-full">
-          <ChatBox ref={chatBoxRef}/>
+          <ChatBox ref={chatBoxRef} isLoading={isLoading} />
           <QuestionField onAskPressed={getTableDetails} />
         </div>
       </main>
