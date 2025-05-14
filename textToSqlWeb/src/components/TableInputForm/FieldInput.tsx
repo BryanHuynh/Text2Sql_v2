@@ -47,7 +47,7 @@ const FieldInput: React.FC<FieldInputProps> = ({
         }}
       >
         <img
-          src="/public/cross.svg"
+          src="/cross.svg"
           className="dark:invert fill-current text-red-400"
           alt="Add Icon"
           color="red"

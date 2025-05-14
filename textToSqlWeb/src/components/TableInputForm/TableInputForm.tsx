@@ -86,7 +86,7 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
         aria-label="Remove table"
       >
         <img
-          src="/public/cross.svg" // Assuming you have a cross icon, or use text
+          src="/cross.svg" // Assuming you have a cross icon, or use text
           className="dark:invert "
           alt="Remove Table Icon"
           width={16} // Adjusted size
@@ -121,7 +121,7 @@ const TableInputForm: React.FC<TableInputFormProps> = ({
         {" "}
         {/* Added cursor-pointer */}
         <img
-          src="\public\add.svg"
+          src="/add.svg"
           className="dark:invert"
           alt="Add Icon"
           width={25}
