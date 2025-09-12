@@ -1,17 +1,18 @@
 import { mapUserFilesFromAPI } from "./userfiles.adapter";
 import type { UserFile, UserFilesAPIResponse } from "./userfiles.types";
+import { v4 as uuidv4 } from "uuid";
 
 export async function getUserFiles(id: string): Promise<UserFile[]> {
 	const resp: UserFilesAPIResponse = {
 		data: [
 			{
-				id: "123",
+				id: uuidv4(),
 				filename: "foo",
 				created_at: new Date().toISOString(),
 				content: "HELLO WORLD",
 			},
 			{
-				id: "1234",
+				id: uuidv4(),
 				filename: "foo2",
 				created_at: new Date().toISOString(),
 				content: "HELLO WORLD 2",

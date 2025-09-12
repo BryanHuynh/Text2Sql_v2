@@ -1,10 +1,12 @@
-import { Box, Button, List, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, IconButton, List, Paper, Stack, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import AddIcon from "@mui/icons-material/Add";
 import { FileItem } from "./FileItem";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
 import { setUserFiles } from "../../reducers/userfiles.reducer";
+import { v4 as uuidv4 } from "uuid";
+import type { UserFile } from "../../features/userfiles/userfiles.types";
 
 export const SidePanel = () => {
 	const { items: userFiles, status } = useSelector((s: RootState) => s.userfiles);
@@ -26,14 +28,26 @@ export const SidePanel = () => {
 		dispatch(setUserFiles(next));
 	}
 
+	function createNewFile() {
+		const file: UserFile = {
+			id: uuidv4(),
+			filename: "new file",
+			created_at: new Date().toISOString(),
+			content: "",
+		};
+		dispatch(setUserFiles(userFiles.concat(file)));
+	}
+
 	return (
 		<Paper sx={{ height: "100%", p: 2 }}>
 			<Stack sx={{ height: "100%" }} spacing={2}>
 				<Box display="flex" justifyContent="space-between">
-					<Typography component="h3" variant="subtitle2">
+					<Typography component="h3" variant="subtitle2" alignContent="center">
 						Files
 					</Typography>
-					<AddIcon />
+					<IconButton onClick={() => createNewFile()}>
+						<AddIcon />
+					</IconButton>
 				</Box>
 				<Divider orientation="horizontal" />
 				<List>
