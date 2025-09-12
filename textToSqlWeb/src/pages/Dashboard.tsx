@@ -5,31 +5,28 @@ import { SidePanel } from "../components/SidePanel/SidePanel";
 import { useDispatch } from "react-redux";
 import { fetchUserSchemaFiles } from "../reducers/userfiles.reducer";
 import type { AppDispatch } from "../store";
+import { CodeEditor } from "../components/CodeEditor/code-editor";
 
 export const Dashboard = () => {
-	const codePanelOpen = true;
 	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
 		dispatch(fetchUserSchemaFiles("1"));
 	}, []);
 	return (
-		<Box>
+		<Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
 			<DefaultAppBar />
-			<Box sx={{ display: "flex", flexDirection: "row", minHeight: "100vh" }}>
+			<Box sx={{ display: "flex", flexDirection: "row", flex: 1 }}>
 				<Box sx={{ p: 2, width: "15vw" }}>
 					<SidePanel />
 				</Box>
 				<Stack sx={{ width: "100%", height: "85%" }}>
-					<Grid container sx={{ p: 2, width: "100%", height: "100%" }}>
-						{codePanelOpen && (
-							<Grid sx={{ width: "50%", height: "100%" }}>
-								<Paper sx={{ p: 2, height: "100%", textAlign: "center" }}>
-									Code Panel
-								</Paper>
-							</Grid>
-						)}
-						<Grid sx={{ width: codePanelOpen ? "50%" : "100%", height: "100%" }}>
+					<Grid container sx={{ p: 2, width: "100%", height: "100%" }} columnSpacing={2}>
+						<Grid sx={{ flex: 1, height: "100%" }}>
+							<CodeEditor />
+						</Grid>
+
+						<Grid sx={{ flex: 1, height: "100%" }}>
 							<Paper sx={{ p: 2, height: "100%", textAlign: "center" }}>
 								Chat Screen
 							</Paper>
