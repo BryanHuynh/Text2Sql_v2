@@ -7,6 +7,7 @@ import type { AppDispatch, RootState } from "../../store";
 import { setUserFiles } from "../../reducers/userfiles.reducer";
 import { v4 as uuidv4 } from "uuid";
 import type { UserFile } from "../../features/userfiles/userfiles.types";
+import { createNewUserFile } from "../../features/userfiles/userfiles.api";
 
 export const SidePanel = () => {
 	const { items: userFiles, status } = useSelector((s: RootState) => s.userfiles);
@@ -35,7 +36,11 @@ export const SidePanel = () => {
 			created_at: new Date().toISOString(),
 			content: "",
 		};
-		dispatch(setUserFiles(userFiles.concat(file)));
+		createNewUserFile(file).then((res: boolean) => {
+			if (res) {
+				dispatch(setUserFiles(userFiles.concat(file)));
+			}
+		});
 	}
 
 	return (

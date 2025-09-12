@@ -31,7 +31,6 @@ const userFilesSlice = createSlice({
 	initialState,
 	reducers: {
 		setUserFiles(state, action: PayloadAction<UserFile[]>) {
-			console.log(state, action);
 			state.items = action.payload;
 			state.status = "succeeded";
 			state.error = undefined;
