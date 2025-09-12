@@ -7,26 +7,44 @@ import type { AppDispatch, RootState } from "../../store";
 import { setUserFiles } from "../../reducers/userfiles.reducer";
 import { v4 as uuidv4 } from "uuid";
 import type { UserFile } from "../../features/userfiles/userfiles.types";
-import { createNewUserFile } from "../../features/userfiles/userfiles.api";
+import {
+	createNewUserFile,
+	deleteUserFile,
+	updateUserFile,
+} from "../../features/userfiles/userfiles.api";
 
 export const SidePanel = () => {
 	const { items: userFiles, status } = useSelector((s: RootState) => s.userfiles);
 	const dispatch = useDispatch<AppDispatch>();
 
 	function handleRename(file_id: string, new_name: string) {
-		const exists = userFiles.some((file) => file.id === file_id);
-		if (!exists) throw new Error(`Unable to find file with id: ${file_id}`);
-		const next = userFiles.map((file) =>
-			file.id === file_id ? { ...file, filename: new_name } : file
-		);
-		dispatch(setUserFiles(next));
+		const file = userFiles.find((file) => file.id === file_id);
+		if (!file) throw new Error(`Unable to find file with id: ${file_id}`);
+		const new_file = { ...file, filename: new_name };
+
+		updateUserFile(file_id, new_file)
+			.then((res) => {
+				if (!res) throw new Error(`unable to update file ${file_id}`);
+				const next = userFiles.map((file) => (file.id === file_id ? new_file : file));
+				dispatch(setUserFiles(next));
+			})
+			.catch((err) => {
+				throw err;
+			});
 	}
 
 	function deleteFile(file_id: string) {
 		const exists = userFiles.some((file) => file.id === file_id);
 		if (!exists) throw new Error(`Unable to find file with id: ${file_id}`);
-		const next = userFiles.filter((file) => file.id != file_id);
-		dispatch(setUserFiles(next));
+		deleteUserFile(file_id)
+			.then((res) => {
+				if (!res) throw new Error(`unable to delete file ${file_id}`);
+				const next = userFiles.filter((file) => file.id != file_id);
+				dispatch(setUserFiles(next));
+			})
+			.catch((err) => {
+				throw err;
+			});
 	}
 
 	function createNewFile() {

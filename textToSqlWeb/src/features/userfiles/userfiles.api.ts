@@ -26,6 +26,10 @@ export async function createNewUserFile(userFile: UserFile): Promise<boolean> {
 	return true;
 }
 
-export async function renameUserFile(user: string, userFile: UserFile): Promise<boolean> {
+export async function updateUserFile(file_id: string, userFile: UserFile): Promise<boolean> {
+	return true;
+}
+
+export async function deleteUserFile(file_id: string): Promise<boolean> {
 	return true;
 }
