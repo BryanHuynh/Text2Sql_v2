@@ -1,4 +1,16 @@
-import { IconButton, ListItem, ListItemButton, ListItemText, TextField } from "@mui/material";
+import {
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	IconButton,
+	ListItem,
+	ListItemButton,
+	ListItemText,
+	TextField,
+} from "@mui/material";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import { useState } from "react";
@@ -13,6 +25,7 @@ export const FileItem = ({ fileId, fileName, handleRename, deleteFile }: FileIte
 	const [showTools, setShowTools] = useState<boolean>(false);
 	const [renaming, setRenaming] = useState<boolean>(false);
 	const [label, setLabel] = useState<string>(fileName);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
 	function onRenameComplete() {
 		setRenaming(false);
@@ -58,12 +71,39 @@ export const FileItem = ({ fileId, fileName, handleRename, deleteFile }: FileIte
 						>
 							<DriveFileRenameOutlineOutlinedIcon fontSize="small" />
 						</IconButton>
-						<IconButton size="small" onClick={() => deleteFile(fileId)}>
+						<IconButton size="small" onClick={() => setDeleteDialogOpen(true)}>
 							<DeleteOutlineOutlinedIcon fontSize="small" />
 						</IconButton>
 					</div>
 				)}
 			</ListItemButton>
+			<Dialog
+				open={deleteDialogOpen}
+				onClose={() => setDeleteDialogOpen(false)}
+				aria-labelledby="alert-dialog-title"
+				aria-describedby="alert-dialog-description"
+			>
+				<DialogTitle id="alert-dialog-title">
+					{`Are you sure you want to delete ${fileName}?`}
+				</DialogTitle>
+				<DialogContent>
+					<DialogContentText id="alert-dialog-description">
+						This action cannot be reversed!
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setDeleteDialogOpen(false)}>No</Button>
+					<Button
+						onClick={() => {
+							setDeleteDialogOpen(false);
+							deleteFile(fileId);
+						}}
+						autoFocus
+					>
+						Yes
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</ListItem>
 	);
 };
