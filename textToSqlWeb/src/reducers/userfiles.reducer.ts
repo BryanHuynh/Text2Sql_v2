@@ -1,41 +1,41 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { getUserFiles } from "../features/userfiles/userfiles.api";
-import type { UserFile } from "../features/userfiles/userfiles.types";
+import { getUserSchemaFiles } from "../features/userSchemaFiles/userSchemaFiles.api";
+import type { UserSchemaFile } from "../features/userSchemaFiles/userSchemaFile.types";
 
 // Stores user files. Initial data is loaded via API.
 
 export type LoadStatus = "idle" | "loading" | "succeeded" | "failed";
 
-export interface UserFilesState {
-	items: UserFile[];
+export interface UserSchemaFilesState {
+	items: UserSchemaFile[];
 	status: LoadStatus;
 	error?: string;
 }
 
 // Async thunk to fetch user files for a given user id
-export const fetchUserFiles = createAsyncThunk<UserFile[], string>(
+export const fetchUserSchemaFiles = createAsyncThunk<UserSchemaFile[], string>(
 	"userfiles/fetch",
 	async (userId: string) => {
-		const files = await getUserFiles(userId);
+		const files = await getUserSchemaFiles(userId);
 		return files;
 	}
 );
 
-const initialState: UserFilesState = {
+const initialState: UserSchemaFilesState = {
 	items: [],
 	status: "idle",
 };
 
-const userFilesSlice = createSlice({
+const userSchemaFilesSlice = createSlice({
 	name: "userfiles",
 	initialState,
 	reducers: {
-		setUserFiles(state, action: PayloadAction<UserFile[]>) {
+		setUserSchemaFiles(state, action: PayloadAction<UserSchemaFile[]>) {
 			state.items = action.payload;
 			state.status = "succeeded";
 			state.error = undefined;
 		},
-		clearUserFiles(state) {
+		clearUserSchemaFiles(state) {
 			state.items = [];
 			state.status = "idle";
 			state.error = undefined;
@@ -43,22 +43,23 @@ const userFilesSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchUserFiles.pending, (state) => {
+			.addCase(fetchUserSchemaFiles.pending, (state) => {
 				state.status = "loading";
 				state.error = undefined;
 			})
-			.addCase(fetchUserFiles.fulfilled, (state, action) => {
+			.addCase(fetchUserSchemaFiles.fulfilled, (state, action) => {
 				state.items = action.payload;
 				state.status = "succeeded";
 				state.error = undefined;
 			})
-			.addCase(fetchUserFiles.rejected, (state, action) => {
+			.addCase(fetchUserSchemaFiles.rejected, (state, action) => {
 				state.status = "failed";
 				state.error = action.error?.message || "Failed to load user files";
 			});
 	},
 });
 
-export const { setUserFiles, clearUserFiles } = userFilesSlice.actions;
+export const { setUserSchemaFiles: setUserSchemaFiles, clearUserSchemaFiles } =
+	userSchemaFilesSlice.actions;
 
-export default userFilesSlice.reducer;
+export default userSchemaFilesSlice.reducer;

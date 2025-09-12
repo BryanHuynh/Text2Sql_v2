@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import DefaultAppBar from "../components/Appbar/AppBar";
 import { SidePanel } from "../components/SidePanel/SidePanel";
 import { useDispatch } from "react-redux";
-import { fetchUserFiles } from "../reducers/userfiles.reducer";
+import { fetchUserSchemaFiles } from "../reducers/userfiles.reducer";
 import type { AppDispatch } from "../store";
 
 export const Dashboard = () => {
@@ -11,7 +11,7 @@ export const Dashboard = () => {
 	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
-		dispatch(fetchUserFiles("1"));
+		dispatch(fetchUserSchemaFiles("1"));
 	}, []);
 	return (
 		<Box>

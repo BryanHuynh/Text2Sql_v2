@@ -1,4 +1,4 @@
-export interface UserFilesAPIResponse {
+export interface UserSchemaFileAPIResponse {
 	data: {
 		id: string;
 		filename: string;
@@ -7,7 +7,7 @@ export interface UserFilesAPIResponse {
 	}[];
 }
 
-export interface UserFile {
+export interface UserSchemaFile {
 	id: string;
 	filename: string;
 	created_at: string;

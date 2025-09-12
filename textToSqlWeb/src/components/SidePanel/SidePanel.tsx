@@ -4,14 +4,15 @@ import AddIcon from "@mui/icons-material/Add";
 import { FileItem } from "./FileItem";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
-import { setUserFiles } from "../../reducers/userfiles.reducer";
+
 import { v4 as uuidv4 } from "uuid";
-import type { UserFile } from "../../features/userfiles/userfiles.types";
+import type { UserSchemaFile } from "../../features/userSchemaFiles/userSchemaFile.types";
 import {
 	createNewUserFile,
-	deleteUserFile,
-	updateUserFile,
-} from "../../features/userfiles/userfiles.api";
+	deleteUserSchemaFile,
+	updateUserSchemaFile,
+} from "../../features/userSchemaFiles/userSchemaFiles.api";
+import { setUserSchemaFiles } from "../../reducers/userfiles.reducer";
 
 export const SidePanel = () => {
 	const { items: userFiles, status } = useSelector((s: RootState) => s.userfiles);
@@ -22,11 +23,11 @@ export const SidePanel = () => {
 		if (!file) throw new Error(`Unable to find file with id: ${file_id}`);
 		const new_file = { ...file, filename: new_name };
 
-		updateUserFile(file_id, new_file)
+		updateUserSchemaFile(file_id, new_file)
 			.then((res) => {
 				if (!res) throw new Error(`unable to update file ${file_id}`);
 				const next = userFiles.map((file) => (file.id === file_id ? new_file : file));
-				dispatch(setUserFiles(next));
+				dispatch(setUserSchemaFiles(next));
 			})
 			.catch((err) => {
 				throw err;
@@ -36,11 +37,11 @@ export const SidePanel = () => {
 	function deleteFile(file_id: string) {
 		const exists = userFiles.some((file) => file.id === file_id);
 		if (!exists) throw new Error(`Unable to find file with id: ${file_id}`);
-		deleteUserFile(file_id)
+		deleteUserSchemaFile(file_id)
 			.then((res) => {
 				if (!res) throw new Error(`unable to delete file ${file_id}`);
 				const next = userFiles.filter((file) => file.id != file_id);
-				dispatch(setUserFiles(next));
+				dispatch(setUserSchemaFiles(next));
 			})
 			.catch((err) => {
 				throw err;
@@ -48,7 +49,7 @@ export const SidePanel = () => {
 	}
 
 	function createNewFile() {
-		const file: UserFile = {
+		const file: UserSchemaFile = {
 			id: uuidv4(),
 			filename: "new file",
 			created_at: new Date().toISOString(),
@@ -56,7 +57,7 @@ export const SidePanel = () => {
 		};
 		createNewUserFile(file).then((res: boolean) => {
 			if (res) {
-				dispatch(setUserFiles(userFiles.concat(file)));
+				dispatch(setUserSchemaFiles(userFiles.concat(file)));
 			}
 		});
 	}
