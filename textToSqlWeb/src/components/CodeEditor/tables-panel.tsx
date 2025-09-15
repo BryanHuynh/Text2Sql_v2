@@ -78,7 +78,6 @@ export const TablesPanel = () => {
 						maxWidth: 360,
 						bgcolor: "background.paper",
 					}}
-					aria-labelledby="tables-subheader"
 				>
 					{tables.map((table) => (
 						<TableLabel

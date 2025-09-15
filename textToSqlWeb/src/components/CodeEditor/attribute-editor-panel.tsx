@@ -4,6 +4,7 @@ import {
 	CardContent,
 	CardHeader,
 	Checkbox,
+	IconButton,
 	Paper,
 	Table,
 	TableBody,
@@ -14,6 +15,8 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import AddIcon from "@mui/icons-material/Add";
 
 export const AddtributeEditorPanel = () => {
 	const InputField = () => {
@@ -35,40 +38,40 @@ export const AddtributeEditorPanel = () => {
 	];
 
 	return (
-		<Card sx={{ height: "100%" }}>
+		<Card sx={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
 			<CardHeader title={"Table 0"}></CardHeader>
-			<CardContent sx={{ display: "flex", flexDirection: "column" }}>
-				<TableContainer component={Paper}>
-					<Table aria-label="simple table">
+			<CardContent sx={{ height: "100%" }}>
+				<TableContainer
+					sx={{
+						height: "77vh",
+						display: "flex",
+						flexDirection: "column",
+						minHeight: 0,
+					}}
+				>
+					<Table stickyHeader>
 						<TableHead>
 							<TableRow>
 								<TableCell>Name</TableCell>
-								<TableCell align="right">Type</TableCell>
-								<TableCell align="right">PK?</TableCell>
-								<TableCell align="right">FK?</TableCell>
-								<TableCell align="right">Ref</TableCell>
+								<TableCell align="center">Type</TableCell>
+								<TableCell align="center">PK?</TableCell>
+								<TableCell align="center">FK?</TableCell>
+								<TableCell align="center">Ref</TableCell>
+								<TableCell align="center" sx={{ p: 0 }}>
+									<IconButton>
+										<AddIcon />
+									</IconButton>
+								</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{rows.map((row) => (
-								<TableRow
-									key={row.name}
-									sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-								>
+							{rows.map((row, i) => (
+								<TableRow key={i}>
 									<TableCell component="th" scope="row">
-										<TextField
-											id="outlined-basic"
-											variant="outlined"
-											defaultValue={row.name}
-										/>
+										<TextField variant="outlined" defaultValue={row.name} />
 									</TableCell>
 									<TableCell align="right">
-										{" "}
-										<TextField
-											id="outlined-basic"
-											variant="outlined"
-											defaultValue={row.type}
-										/>
+										<TextField variant="outlined" defaultValue={row.type} />
 									</TableCell>
 									<TableCell align="right">
 										<Checkbox checked={row.pk} />
@@ -76,12 +79,16 @@ export const AddtributeEditorPanel = () => {
 									<TableCell align="right">
 										<Checkbox checked={row.fk} />
 									</TableCell>
-									{row.fk && (
-										<TableCell align="right">
-											{" "}
+									<TableCell align="right">
+										{row.fk && (
 											<TextField variant="outlined" defaultValue={row.ref} />
-										</TableCell>
-									)}
+										)}
+									</TableCell>
+									<TableCell component="th" scope="row" sx={{ p: 0 }}>
+										<IconButton>
+											<DeleteOutlineIcon color="error" />
+										</IconButton>
+									</TableCell>
 								</TableRow>
 							))}
 						</TableBody>

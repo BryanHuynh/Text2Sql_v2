@@ -15,13 +15,11 @@ export const CodeEditorPanel = () => {
 				</Toolbar>
 			</AppBar>
 			<Grid container spacing={2} sx={{ p: 2, height: "95%" }}>
-				<Grid size={2} sx={{ height: "100%" }}>
+				<Grid size={3} sx={{ height: "100%" }}>
 					<TablesPanel />
 				</Grid>
-				<Grid size={10}>
-					<Paper sx={{ height: "100%" }}>
-						<AddtributeEditorPanel />
-					</Paper>
+				<Grid size={9}>
+					<AddtributeEditorPanel />
 				</Grid>
 			</Grid>
 		</Paper>
