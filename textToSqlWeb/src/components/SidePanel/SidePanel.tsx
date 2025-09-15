@@ -12,7 +12,7 @@ import {
 	deleteUserSchemaFile,
 	updateUserSchemaFile,
 } from "../../features/userSchemaFiles/userSchemaFiles.api";
-import { setUserSchemaFiles } from "../../reducers/userfiles.reducer";
+import { setUserSchemaFiles } from "../../reducers/userSchemaFiles.reducer";
 
 export const SidePanel = () => {
 	const { items: userFiles, status } = useSelector((s: RootState) => s.userfiles);
