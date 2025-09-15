@@ -19,13 +19,6 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 
 export const AddtributeEditorPanel = () => {
-	const InputField = () => {
-		return (
-			<Box sx={{ display: "flex", flexDirection: "row", my: 1 }}>
-				<TextField id="standard-basic" label="Standard" variant="outlined" size={"small"} />
-			</Box>
-		);
-	};
 	function createData(name, type, pk, fk, ref) {
 		return { name, type, pk, fk, ref };
 	}
