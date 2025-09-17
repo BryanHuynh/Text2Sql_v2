@@ -1,13 +1,18 @@
-import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import { logOut } from "../services/firebase/auth/AuthApi";
 
-export default function DefaultAppBar() {
+interface DefaultAppBarProps {
+	email: string;
+}
+export default function DefaultAppBar({ email }: DefaultAppBarProps) {
+	function handleLogout() {
+		logOut();
+	}
+
 	return (
 		<Box>
 			<AppBar position="static">
@@ -15,7 +20,12 @@ export default function DefaultAppBar() {
 					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
 						Text To Sql
 					</Typography>
-					<Button color="inherit">Login</Button>
+					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+						Welcome {email}
+					</Typography>
+					<Button color="inherit" onClick={handleLogout}>
+						logout
+					</Button>
 				</Toolbar>
 			</AppBar>
 		</Box>

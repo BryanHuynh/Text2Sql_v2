@@ -6,8 +6,10 @@ import { useDispatch } from "react-redux";
 import { fetchUserSchemaFiles } from "../reducers/userSchemaFiles.reducer";
 import type { AppDispatch } from "../store";
 import { CodeEditorPanel } from "../components/CodeEditor/code-editor-panel";
+import { useAuth } from "../components/services/firebase/auth/AuthContent";
 
 export const Dashboard = () => {
+	const { user, loading } = useAuth();
 	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
@@ -15,7 +17,7 @@ export const Dashboard = () => {
 	}, []);
 	return (
 		<Box sx={{ display: "flex", flexDirection: "column", height: "100vh", minHeight: 0 }}>
-			<DefaultAppBar />
+			<DefaultAppBar email={user?.email ?? ""} />
 			<Box sx={{ display: "flex", flexDirection: "row", flex: 1, minHeight: 0 }}>
 				<Box sx={{ p: 2, width: "10vw" }}>
 					<SidePanel />
