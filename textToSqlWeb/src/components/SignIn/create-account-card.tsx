@@ -8,9 +8,10 @@ import type { AuthActionStates } from "./auth-card";
 
 interface CreateAccountCardProps {
 	changeState: (state: AuthActionStates) => void;
+	toastMessage: (message: string) => void;
 }
 
-export const CreateAccountCard = ({ changeState }: CreateAccountCardProps) => {
+export const CreateAccountCard = ({ changeState, toastMessage }: CreateAccountCardProps) => {
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [passwordConfirm, setPasswordConfirm] = useState<string>("");
@@ -19,9 +20,23 @@ export const CreateAccountCard = ({ changeState }: CreateAccountCardProps) => {
 	async function onSubmit(e: FormEvent) {
 		e.preventDefault();
 		setError("");
+		if (!email) {
+			setError("Please Provide an Email");
+			return;
+		}
+		if (!password) {
+			setError("Please Provide a password");
+			return;
+		}
+		if (password != passwordConfirm) {
+			setError("Passwords do not match");
+			return;
+		}
+
 		try {
-			await emailSignUp(email, password);
-			changeState("signup");
+			const res = await emailSignUp(email, password);
+			changeState("signin");
+			toastMessage(res);
 		} catch (error) {
 			if (error instanceof FirebaseError) {
 				setError(error.code ?? "Failed to create account");

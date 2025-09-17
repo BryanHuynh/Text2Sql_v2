@@ -2,18 +2,30 @@ import { Box, Button, IconButton, Stack, TextField, Typography } from "@mui/mate
 import { useState, type FormEvent } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import type { AuthActionStates } from "./auth-card";
+import { emailPasswordReset } from "../services/firebase/auth/AuthApi";
 
 interface ForgotPasswordCardProps {
 	changeState: (state: AuthActionStates) => void;
+	toastMessage: (message: string) => void;
 }
 
-export const ForgotPasswordCard = ({ changeState }: ForgotPasswordCardProps) => {
+export const ForgotPasswordCard = ({ changeState, toastMessage }: ForgotPasswordCardProps) => {
 	const [email, setEmail] = useState<string>("");
 	const [error, setError] = useState<string>("");
 
 	async function onSubmit(e: FormEvent) {
 		e.preventDefault();
 		setError("");
+		if (!email) {
+			setError("Please Provide an Email");
+			return;
+		}
+		try {
+			await emailPasswordReset(email);
+		} finally {
+			toastMessage("Recovery password has been sent to email address");
+			changeState("signin");
+		}
 	}
 
 	return (
