@@ -14,6 +14,7 @@ export const Dashboard = () => {
 
 	useEffect(() => {
 		dispatch(fetchUserSchemaFiles("1"));
+		user?.getIdToken(true).then((idToken) => console.log(idToken));
 	}, []);
 	return (
 		<Box sx={{ display: "flex", flexDirection: "column", height: "100vh", minHeight: 0 }}>
