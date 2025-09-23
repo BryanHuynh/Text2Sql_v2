@@ -5,7 +5,8 @@ import { Dashboard } from "./pages/Dashboard";
 import React, { type ReactElement, type ReactNode } from "react";
 import { CssBaseline } from "@mui/material";
 import { useAuth } from "./services/firebase/auth/AuthContent";
-
+import { store } from "./reducer/store";
+import { Provider } from "react-redux";
 
 function ProtectedRoute({ children }: { children: ReactNode }): ReactElement | null {
 	const { user, loading } = useAuth();
@@ -24,7 +25,9 @@ export default function App() {
 					path="/dashboard"
 					element={
 						<ProtectedRoute>
-							<Dashboard />
+							<Provider store={store}>
+								<Dashboard />
+							</Provider>
 						</ProtectedRoute>
 					}
 				/>
