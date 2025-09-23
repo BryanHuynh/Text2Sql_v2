@@ -9,7 +9,7 @@ import {
 	getUserDatabases,
 	renameDatabase,
 	type UserDatabase,
-} from "../../services/UserDatabases/user-databases";
+} from "../../services/database/user-databases";
 
 export const SidePanel = () => {
 	const [userDatabases, setUserDatabases] = useState<UserDatabase[]>();
