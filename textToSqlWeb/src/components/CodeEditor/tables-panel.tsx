@@ -1,45 +1,52 @@
-import { Box, IconButton, List, ListSubheader, Paper, Divider } from "@mui/material";
+import { Box, IconButton, List, ListSubheader, Paper, Divider, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { TableLabel } from "./table-label";
+import type { UserDatabase } from "../../services/database/user-databases";
+import {
+	createNewTable,
+	deleteTable,
+	getUserTables,
+	renameTable,
+	type UserTable,
+} from "../../services/database/user-tables";
+import { useDispatch } from "react-redux";
+import { changeTable } from "../../reducer/slices/activePanelsSlice";
 
-interface UserTable {
-	id: string;
-	name: string;
+interface TablePanelProps {
+	database: UserDatabase;
 }
-
-export const TablesPanel = () => {
+export const TablesPanel = ({ database }: TablePanelProps) => {
 	const [tables, setTables] = useState<UserTable[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
-		const _tables: UserTable[] = [];
-		for (let i = 0; i < 5; i++) {
-			_tables.push({
-				id: uuidv4(),
-				name: `table ${i * 100}`,
-			});
+		async function assignTables() {
+			setLoading(true);
+			await getUserTables(database.id)
+				.then(setTables)
+				.then(() => setLoading(false));
 		}
-		setTables(_tables);
-	}, []);
+		assignTables();
+	}, [database]);
 
-	function handleAddTable() {
-		setTables((prev) => [...prev, { id: uuidv4(), name: "new table" }]);
+	async function handleAddTable() {
+		await createNewTable(database.id).then((newTable) => {
+			setTables((prev) => [...prev, newTable]);
+		});
 	}
 
-	function handleRenameTable(table_id: string, new_name: string) {
-		const index = tables.findIndex((table) => table.id == table_id);
-		if (index == -1) throw new Error(`unable to find table ${table_id}`);
-		const _table = { ...tables[index], name: new_name };
-		setTables(tables.map((table) => (table.id != _table.id ? table : _table)));
+	async function handleRenameTable(table_id: string, new_name: string) {
+		await renameTable(table_id, new_name, database.id).then((updatedTable: UserTable) => {
+			setTables(tables.map((table) => (table.id != updatedTable.id ? table : updatedTable)));
+		});
 	}
 
-	function handleDeleteTable(table_id: string) {
-		const exist = tables.some((table) => table.id == table_id);
-		if (!exist) throw new Error(`unable to find table ${table_id}`);
-		const next = tables.filter((table) => table.id != table_id);
-		console.log(next);
-		setTables(next);
+	async function handleDeleteTable(table_id: string) {
+		await deleteTable(table_id).then(() => {
+			setTables(tables.filter((table) => table.id != table_id));
+		});
 	}
 
 	return (
@@ -79,15 +86,20 @@ export const TablesPanel = () => {
 						bgcolor: "background.paper",
 					}}
 				>
-					{tables.map((table) => (
-						<TableLabel
-							key={table.id}
-							tableId={table.id}
-							tableName={table.name}
-							handleRename={handleRenameTable}
-							deleteTable={handleDeleteTable}
-						/>
-					))}
+					{loading ? (
+						<Typography>Loading Tables...</Typography>
+					) : (
+						tables.map((table) => (
+							<TableLabel
+								key={table.id}
+								tableId={table.id}
+								tableName={table.tablename}
+								handleRename={handleRenameTable}
+								deleteTable={handleDeleteTable}
+								onClick={() => dispatch(changeTable(table))}
+							/>
+						))
+					)}
 				</List>
 			</Box>
 		</Paper>

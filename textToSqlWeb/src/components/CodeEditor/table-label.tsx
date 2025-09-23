@@ -19,9 +19,16 @@ type TableLabelProps = {
 	tableName: string;
 	handleRename: (table_id: string, new_name: string) => void;
 	deleteTable: (table_id: string) => void;
+	onClick: () => void;
 };
 
-export const TableLabel = ({ tableId, tableName, handleRename, deleteTable }: TableLabelProps) => {
+export const TableLabel = ({
+	tableId,
+	tableName,
+	handleRename,
+	deleteTable,
+	onClick,
+}: TableLabelProps) => {
 	const [showTools, setShowTools] = useState<boolean>(false);
 	const [renaming, setRenaming] = useState<boolean>(false);
 	const [label, setLabel] = useState<string>(tableName);
@@ -41,6 +48,7 @@ export const TableLabel = ({ tableId, tableName, handleRename, deleteTable }: Ta
 			<ListItemButton
 				onMouseEnter={() => setShowTools(true)}
 				onMouseLeave={() => setShowTools(false)}
+				onClick={() => onClick()}
 			>
 				{!renaming ? (
 					<ListItemText>{label}</ListItemText>

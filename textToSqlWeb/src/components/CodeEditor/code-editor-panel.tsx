@@ -21,7 +21,7 @@ export const CodeEditorPanel = ({ database }: CodeEditorPanelProps) => {
 			</AppBar>
 			<Grid container spacing={2} sx={{ p: 2, height: "95%" }}>
 				<Grid size={3} sx={{ height: "100%" }}>
-					<TablesPanel />
+					<TablesPanel database={database}/>
 				</Grid>
 				<Grid size={9}>
 					<AddtributeEditorPanel />
