@@ -15,7 +15,7 @@ export const Dashboard = () => {
 		<Box sx={{ display: "flex", flexDirection: "column", height: "100vh", minHeight: 0 }}>
 			<DefaultAppBar email={user?.email ?? ""} />
 			<Box sx={{ display: "flex", flexDirection: "row", flex: 1, minHeight: 0 }}>
-				<Box sx={{ p: 2, width: "10vw" }}>
+				<Box sx={{ p: 2, width: "15vw" }}>
 					<SidePanel />
 				</Box>
 				<Stack sx={{ width: "100%", flex: 1, minHeight: 0 }}>
