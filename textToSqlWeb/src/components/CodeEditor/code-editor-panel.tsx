@@ -2,15 +2,20 @@ import { AppBar, Grid, Paper, Toolbar, Typography } from "@mui/material";
 import CodeIcon from "@mui/icons-material/Code";
 import { TablesPanel } from "./tables-panel";
 import { AddtributeEditorPanel } from "./attribute-editor-panel";
+import type { UserDatabase } from "../../services/database/user-databases";
 
-export const CodeEditorPanel = () => {
+interface CodeEditorPanelProps {
+	database: UserDatabase;
+}
+
+export const CodeEditorPanel = ({ database }: CodeEditorPanelProps) => {
 	return (
 		<Paper sx={{ display: "flex", flexDirection: "column", flex: 1, height: "100%" }}>
 			<AppBar position="static" color="primary">
 				<Toolbar variant="dense">
 					<CodeIcon fontSize="small" />
 					<Typography variant="subtitle1" color="inherit" component="div" sx={{ px: 1 }}>
-						Foo2
+						{database.filename}
 					</Typography>
 				</Toolbar>
 			</AppBar>

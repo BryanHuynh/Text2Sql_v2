@@ -10,10 +10,13 @@ import {
 	renameDatabase,
 	type UserDatabase,
 } from "../../services/database/user-databases";
+import { useDispatch } from "react-redux";
+import { changeDatabase } from "../../reducer/slices/activePanelsSlice";
 
 export const SidePanel = () => {
 	const [userDatabases, setUserDatabases] = useState<UserDatabase[]>();
 	const [loading, setLoading] = useState<boolean>(true);
+	const dispatch = useDispatch();
 
 	async function fetchDatabases() {
 		setLoading(true);
@@ -77,6 +80,7 @@ export const SidePanel = () => {
 								fileName={f.filename}
 								handleRename={handleRename}
 								deleteFile={deleteFile}
+								onClick={() => dispatch(changeDatabase(f))}
 							/>
 						))}
 				</List>

@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
+import type { UserDatabase } from "../../services/database/user-databases";
 
 export type ActivePanelsType = {
-	database?: string;
+	database?: UserDatabase;
 	table?: string;
 };
 
