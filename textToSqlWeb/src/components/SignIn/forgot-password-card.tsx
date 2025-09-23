@@ -2,7 +2,7 @@ import { Box, Button, IconButton, Stack, TextField, Typography } from "@mui/mate
 import { useState, type FormEvent } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import type { AuthActionStates } from "./auth-card";
-import { emailPasswordReset } from "../services/firebase/auth/AuthApi";
+import { emailPasswordReset } from "../../services/firebase/auth/AuthApi";
 
 interface ForgotPasswordCardProps {
 	changeState: (state: AuthActionStates) => void;

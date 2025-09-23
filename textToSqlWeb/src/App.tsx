@@ -4,8 +4,8 @@ import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import React, { type ReactElement, type ReactNode } from "react";
 import { CssBaseline } from "@mui/material";
-import Login from "./pages/Login";
-import { useAuth } from "./components/services/firebase/auth/AuthContent";
+import { useAuth } from "./services/firebase/auth/AuthContent";
+
 
 function ProtectedRoute({ children }: { children: ReactNode }): ReactElement | null {
 	const { user, loading } = useAuth();
