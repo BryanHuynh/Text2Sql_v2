@@ -18,6 +18,7 @@ export const activePanelsSlices = createSlice({
 	reducers: {
 		changeDatabase: (state, action) => {
 			state.database = action.payload;
+			state.table = undefined;
 		},
 		changeTable: (state, action) => {
 			state.table = action.payload;
