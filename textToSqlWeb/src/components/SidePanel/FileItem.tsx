@@ -19,9 +19,16 @@ type FileItemProps = {
 	fileName: string;
 	handleRename: (file_id: string, new_name: string) => void;
 	deleteFile: (file_id: string) => void;
+	onClick: () => void;
 };
 
-export const FileItem = ({ fileId, fileName, handleRename, deleteFile }: FileItemProps) => {
+export const FileItem = ({
+	fileId,
+	fileName,
+	handleRename,
+	deleteFile,
+	onClick,
+}: FileItemProps) => {
 	const [showTools, setShowTools] = useState<boolean>(false);
 	const [renaming, setRenaming] = useState<boolean>(false);
 	const [label, setLabel] = useState<string>(fileName);
@@ -41,6 +48,7 @@ export const FileItem = ({ fileId, fileName, handleRename, deleteFile }: FileIte
 			<ListItemButton
 				onMouseEnter={() => setShowTools(true)}
 				onMouseLeave={() => setShowTools(false)}
+				onClick={() => onClick()}
 			>
 				{!renaming ? (
 					<ListItemText>{label}</ListItemText>

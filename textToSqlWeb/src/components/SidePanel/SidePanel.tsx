@@ -2,72 +2,59 @@ import { Box, Button, IconButton, List, Paper, Stack, Typography } from "@mui/ma
 import Divider from "@mui/material/Divider";
 import AddIcon from "@mui/icons-material/Add";
 import { FileItem } from "./FileItem";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../store";
-
-import { v4 as uuidv4 } from "uuid";
-import type { UserSchemaFile } from "../../features/userSchemaFiles/userSchemaFile.types";
+import { useEffect, useState } from "react";
 import {
-	createNewUserFile,
-	deleteUserSchemaFile,
-	updateUserSchemaFile,
-} from "../../features/userSchemaFiles/userSchemaFiles.api";
-import { setUserSchemaFiles } from "../../reducers/userSchemaFiles.reducer";
+	createNewDatabase,
+	deleteDatabase,
+	getUserDatabases,
+	renameDatabase,
+	type UserDatabase,
+} from "../../services/database/user-databases";
+import { useDispatch } from "react-redux";
+import { changeDatabase } from "../../reducer/slices/activePanelsSlice";
 
 export const SidePanel = () => {
-	const { items: userFiles, status } = useSelector((s: RootState) => s.userfiles);
-	const dispatch = useDispatch<AppDispatch>();
+	const [userDatabases, setUserDatabases] = useState<UserDatabase[]>();
+	const [loading, setLoading] = useState<boolean>(true);
+	const dispatch = useDispatch();
+
+	async function fetchDatabases() {
+		setLoading(true);
+		await getUserDatabases()
+			.then(setUserDatabases)
+			.then(() => {
+				setLoading(false);
+			});
+	}
+	useEffect(() => {
+		fetchDatabases();
+	}, []);
 
 	function handleRename(file_id: string, new_name: string) {
-		const file = userFiles.find((file) => file.id === file_id);
-		if (!file) throw new Error(`Unable to find file with id: ${file_id}`);
-		const new_file = { ...file, filename: new_name };
-
-		updateUserSchemaFile(file_id, new_file)
-			.then((res) => {
-				if (!res) throw new Error(`unable to update file ${file_id}`);
-				const next = userFiles.map((file) => (file.id === file_id ? new_file : file));
-				dispatch(setUserSchemaFiles(next));
-			})
-			.catch((err) => {
-				throw err;
-			});
-	}
-
-	function deleteFile(file_id: string) {
-		const exists = userFiles.some((file) => file.id === file_id);
-		if (!exists) throw new Error(`Unable to find file with id: ${file_id}`);
-		deleteUserSchemaFile(file_id)
-			.then((res) => {
-				if (!res) throw new Error(`unable to delete file ${file_id}`);
-				const next = userFiles.filter((file) => file.id != file_id);
-				dispatch(setUserSchemaFiles(next));
-			})
-			.catch((err) => {
-				throw err;
-			});
-	}
-
-	function createNewFile() {
-		const file: UserSchemaFile = {
-			id: uuidv4(),
-			filename: "new file",
-			created_at: new Date().toISOString(),
-			content: "",
-		};
-		createNewUserFile(file).then((res: boolean) => {
-			if (res) {
-				dispatch(setUserSchemaFiles(userFiles.concat(file)));
-			}
+		renameDatabase(file_id, new_name).then(() => {
+			setUserDatabases((prev) =>
+				prev ? prev.map((db) => (db.id === file_id ? { ...db, name: new_name } : db)) : []
+			);
 		});
 	}
 
+	function deleteFile(file_id: string) {
+		deleteDatabase(file_id).then(() => {
+			setUserDatabases((prev) => (prev ? prev.filter((db) => db.id !== file_id) : []));
+		});
+	}
+
+	function createNewFile() {
+		createNewDatabase().then((newDb) => {
+			setUserDatabases((prev) => (prev ? [...prev, newDb] : []));
+		});
+	}
 	return (
 		<Paper sx={{ height: "100%", p: 2 }}>
 			<Stack sx={{ height: "100%" }} spacing={2}>
 				<Box display="flex" justifyContent="space-between">
 					<Typography component="h3" variant="subtitle2" alignContent="center">
-						Files
+						Databases
 					</Typography>
 					<IconButton onClick={() => createNewFile()}>
 						<AddIcon />
@@ -75,25 +62,27 @@ export const SidePanel = () => {
 				</Box>
 				<Divider orientation="horizontal" />
 				<List>
-					{status === "loading" && (
+					{loading && (
 						<Typography variant="body2" sx={{ px: 2 }}>
 							Loading files...
 						</Typography>
 					)}
-					{status !== "loading" && userFiles.length === 0 && (
+					{!loading && userDatabases && userDatabases.length === 0 && (
 						<Typography variant="body2" sx={{ px: 2 }}>
 							No files yet
 						</Typography>
 					)}
-					{userFiles.map((f) => (
-						<FileItem
-							key={f.id}
-							fileId={f.id}
-							fileName={f.filename}
-							handleRename={handleRename}
-							deleteFile={deleteFile}
-						/>
-					))}
+					{userDatabases &&
+						userDatabases.map((f) => (
+							<FileItem
+								key={f.id}
+								fileId={f.id}
+								fileName={f.filename}
+								handleRename={handleRename}
+								deleteFile={deleteFile}
+								onClick={() => dispatch(changeDatabase(f))}
+							/>
+						))}
 				</List>
 				<Box sx={{ mt: "auto", width: "100%" }}>
 					<Button variant="outlined" sx={{ width: "100%" }}>

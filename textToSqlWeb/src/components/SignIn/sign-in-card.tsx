@@ -10,9 +10,9 @@ import {
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useNavigate } from "react-router-dom";
-import { emailSignIn, googleSignIn } from "../services/firebase/auth/AuthApi";
 import { FirebaseError } from "firebase/app";
 import type { AuthActionStates } from "./auth-card";
+import { emailSignIn, googleSignIn } from "../../services/firebase/auth/AuthApi";
 
 interface SignInCardProps {
 	changeState: (state: AuthActionStates) => void;

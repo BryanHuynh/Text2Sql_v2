@@ -1,10 +1,10 @@
 import { Box, Button, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { useState, type FormEvent } from "react";
-import { emailSignUp, googleSignIn } from "../services/firebase/auth/AuthApi";
 import { FirebaseError } from "firebase/app";
 import GoogleIcon from "@mui/icons-material/Google";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import type { AuthActionStates } from "./auth-card";
+import { emailSignUp } from "../../services/firebase/auth/AuthApi";
 
 interface CreateAccountCardProps {
 	changeState: (state: AuthActionStates) => void;
