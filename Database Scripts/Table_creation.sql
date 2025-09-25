@@ -33,6 +33,7 @@ CREATE TABLE TABLE_VARIABLES (
 	fk_flag BOOLEAN NULL,
 	fk_ref_id UUID NULL,
 	usertable_id UUID NOT NULL,
+	variable_order INT,
 	CONSTRAINT fk_usertable
 		FOREIGN KEY(usertable_id)
 		REFERENCES USER_TABLES (id)
@@ -44,6 +45,7 @@ CREATE TABLE TABLE_VARIABLES (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
+
 
 
 
