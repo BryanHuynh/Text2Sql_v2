@@ -90,15 +90,17 @@ export const VariableEditorPanel = ({ table }: VariableEditorPanelProps) => {
 	return (
 		<Card sx={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
 			<CardHeader title={table.tablename}></CardHeader>
-			<CardContent sx={{ height: "100%" }}>
-				<TableContainer
-					sx={{
-						height: "77vh",
-						display: "flex",
-						flexDirection: "column",
-						minHeight: 0,
-					}}
-				>
+			<CardContent
+				sx={{
+					height: "100%",
+					flex: 1,
+					overflow: "auto",
+					display: "flex",
+					flexDirection: "column",
+					minHeight: 0,
+				}}
+			>
+				<TableContainer sx={{}}>
 					{loading ? (
 						<Typography>Loading Variables...</Typography>
 					) : (
