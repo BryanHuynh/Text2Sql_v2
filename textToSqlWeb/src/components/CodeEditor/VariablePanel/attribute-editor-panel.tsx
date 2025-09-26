@@ -17,7 +17,7 @@ import type { UserTable } from "../../../services/database/user-tables";
 import {
 	createNewVariable,
 	deleteVariableById,
-	getTableVariablesForTable,
+	getAllTableVariables,
 	updateTableVariable,
 	type TableVariable,
 	type TableVariableReq,
@@ -30,14 +30,23 @@ interface VariableEditorPanelProps {
 }
 export const VariableEditorPanel = ({ table }: VariableEditorPanelProps) => {
 	const [tableVariables, setTableVariables] = useState<TableVariable[]>([]);
+	const [allTableVariables, setAllTableVariables] = useState<TableVariable[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		async function assignTableVariables() {
 			setLoading(true);
-			await getTableVariablesForTable(table.id)
+			await getAllTableVariables(table.userdatabaseid)
 				.then((variables) => variables.sort((a, b) => a.order - b.order))
-				.then(setTableVariables)
+				.then((variables) => {
+					setAllTableVariables(variables);
+					return variables;
+				})
+				.then((variables) => {
+					setTableVariables(
+						variables.filter((variable) => variable.userTable.id == table.id)
+					);
+				})
 				.then(() => setLoading(false));
 		}
 		assignTableVariables();
@@ -51,29 +60,32 @@ export const VariableEditorPanel = ({ table }: VariableEditorPanelProps) => {
 			fk_flag: false,
 			userTableId: table.id,
 		}).then((variable) => {
+			setAllTableVariables((prev) => [...prev, variable]);
 			setTableVariables((prev) => [...prev, variable]);
 		});
 	}
 
 	async function updateVariable(req: TableVariableReq) {
-		await updateTableVariable(req).then((updated) =>
+		await updateTableVariable(req).then((updated) => {
+			setAllTableVariables((prev) =>
+				prev
+					? prev.map((variable) => (variable.id === updated.id ? updated : variable))
+					: []
+			);
 			setTableVariables((prev) =>
 				prev
 					? prev.map((variable) => (variable.id === updated.id ? updated : variable))
 					: []
-			)
-		);
+			);
+		});
 	}
 
 	async function deleteVariable(id: string): Promise<void> {
 		await deleteVariableById(id).then(() => {
+			setAllTableVariables((prev) => prev.filter((variable) => variable.id != id));
 			setTableVariables((prev) => prev.filter((variable) => variable.id != id));
 		});
 	}
-
-	useEffect(() => {
-		console.log(tableVariables);
-	}, [tableVariables]);
 
 	return (
 		<Card sx={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
@@ -109,6 +121,7 @@ export const VariableEditorPanel = ({ table }: VariableEditorPanelProps) => {
 								{tableVariables &&
 									tableVariables.map((row, i) => (
 										<VariableTableRow
+											allTableVariables={allTableVariables}
 											variable={row}
 											key={i}
 											updateVariable={updateVariable}

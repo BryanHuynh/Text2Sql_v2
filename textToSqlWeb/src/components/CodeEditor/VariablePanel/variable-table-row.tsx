@@ -1,9 +1,8 @@
-import { useCallback, useRef, useState, type KeyboardEventHandler } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEventHandler } from "react";
 import {
 	Checkbox,
 	FormControl,
 	IconButton,
-	InputLabel,
 	MenuItem,
 	Select,
 	TableCell,
@@ -15,12 +14,14 @@ import type { TableVariable, TableVariableReq } from "../../../services/database
 import { VariableTypes } from "./VariableTypes";
 
 interface VariableTableRowProps {
+	allTableVariables: TableVariable[];
 	variable: TableVariable;
 	updateVariable: (variable: TableVariableReq) => Promise<void>;
 	deleteVariable: (id: string) => Promise<void>;
 }
 
 export const VariableTableRow = ({
+	allTableVariables,
 	variable,
 	updateVariable,
 	deleteVariable,
@@ -31,9 +32,7 @@ export const VariableTableRow = ({
 	const original = useRef<TableVariable>(variable);
 
 	function createReferenceLabel(v: TableVariable) {
-		const ref = v.referenceTable;
-		if (!ref?.userTable) return "";
-		return `${ref.userTable.tablename}.${ref.variableName}`;
+		return `${v.userTable.tablename}.${v.variableName}`;
 	}
 
 	const commit = useCallback(
@@ -60,12 +59,19 @@ export const VariableTableRow = ({
 
 	const setVarType = (typ: string) => setValue((prev) => ({ ...prev, variableType: typ }));
 
+	const setRefVariable = (ref: TableVariable) =>
+		setValue((prev) => ({ ...prev, referenceVariable: ref }));
+
 	const onKeyDown: KeyboardEventHandler<HTMLDivElement> = (e) => {
 		if (e.key == "Escape") {
 			setValue(original.current);
 			(e.currentTarget as HTMLInputElement).blur();
 		}
 	};
+
+	useEffect(() => {
+		// console.log(value);
+	}, [value]);
 
 	return (
 		<TableRow hover>
@@ -119,7 +125,7 @@ export const VariableTableRow = ({
 						const next: TableVariable = {
 							...value,
 							fk_flag: checked,
-							referenceTable: checked ? value.referenceTable : undefined,
+							referenceVariable: checked ? value.referenceVariable : undefined,
 						};
 						setValue(next);
 						commit(next);
@@ -128,14 +134,37 @@ export const VariableTableRow = ({
 				/>
 			</TableCell>
 
-			<TableCell align="right">
+			<TableCell align="center" sx={{ minWidth: "10rem" }}>
 				{value.fk_flag && (
-					<TextField
-						variant="outlined"
-						value={createReferenceLabel(value)}
-						disabled
-						fullWidth
-					/>
+					<FormControl fullWidth>
+						<Select
+							value={value.referenceVariable ? value.referenceVariable.id : ""}
+							onChange={(e) => {
+								const selectedVariable = allTableVariables.find(
+									(variable) => variable.id === e.target.value
+								);
+								if (!selectedVariable) return;
+								setRefVariable(selectedVariable);
+							}}
+							onBlur={() => commit()}
+							fullWidth
+						>
+							{allTableVariables
+								.sort((a, b) => {
+									if (a.userTable.tablename != b.userTable.tablename) {
+										return a.userTable.tablename.localeCompare(
+											b.userTable.tablename
+										);
+									}
+									return a.variableName.localeCompare(b.variableName);
+								})
+								.map((variable) => (
+									<MenuItem value={variable.id}>
+										{createReferenceLabel(variable)}
+									</MenuItem>
+								))}
+						</Select>
+					</FormControl>
 				)}
 			</TableCell>
 

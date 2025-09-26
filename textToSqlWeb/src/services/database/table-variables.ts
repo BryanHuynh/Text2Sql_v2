@@ -8,7 +8,7 @@ export type TableVariable = {
 	pk_flag: boolean;
 	fk_flag: boolean;
 	userTable: UserTable;
-	referenceTable?: TableVariable;
+	referenceVariable?: TableVariable;
 	order: number;
 };
 
@@ -19,7 +19,7 @@ export type TableVariableReq = {
 	pk_flag: boolean;
 	fk_flag: boolean;
 	userTableId?: string;
-	referenceVariable?: string;
+	referenceVariable?: TableVariable;
 	order?: number;
 };
 
