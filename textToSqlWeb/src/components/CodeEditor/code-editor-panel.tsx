@@ -21,14 +21,14 @@ export const CodeEditorPanel = ({ database }: CodeEditorPanelProps) => {
 					<CodeIcon fontSize="small" />
 					<Typography variant="subtitle1" color="inherit" component="div" sx={{ px: 1 }}>
 						{database.filename}
-					</Typography>	
+					</Typography>
 				</Toolbar>
 			</AppBar>
 			<Grid container spacing={2} sx={{ p: 2, height: "95%" }}>
 				<Grid size={3} sx={{ height: "100%" }}>
 					<TablesPanel database={database} />
 				</Grid>
-				<Grid size={9}>
+				<Grid size={9} sx={{ height: "100%" }}>
 					{selectedTable && <VariableEditorPanel table={selectedTable} />}
 				</Grid>
 			</Grid>
