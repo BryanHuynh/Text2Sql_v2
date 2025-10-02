@@ -10,3 +10,4 @@ models
 __pycache__
 Logs
 Server/.venv
+Server/scripts/eval_Results.jsonl

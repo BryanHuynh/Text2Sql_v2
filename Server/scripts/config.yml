@@ -1,0 +1,17 @@
+fine_tuned_model_directory: '../fine_tuned_flan_t5_sql'
+logging_file: '../Logs/logging.log'
+spider_training_dataset: "../spider_data/train_spider.json"
+spider_training_tables_dataset: "../spider_data/tables.json"
+spider_validation_dataset: "../spider_data/train_others.json" 
+spider_validation_tables_dataset: "../spider_data/tables.json"
+spider_test_dataset: "../spider_data/test.json"
+spider_test_tables_dataset: "../spider_data/test_tables.json"
+pretrained_source_model: "google/flan-t5-large"
+model_save_location: "../google_flan-t5-large"
+
+evaluation_steps: 8
+logging_steps: 8
+batch_size: 5
+gradient_accumulation_steps: 410
+gradient_checkpointing: True
+
