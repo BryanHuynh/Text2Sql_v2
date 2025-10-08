@@ -12,7 +12,7 @@ def Resolve_Encoder(databases, tok):
 
     database_indexes = _generate_database_index(databases)
 
-    def _generate_schema(db_id):
+    def _generate_schema(db_id: str):
         database = databases[database_indexes[db_id]]
         column_names = database["column_names_original"]
         column_types = database["column_types"]
@@ -94,7 +94,6 @@ def Resolve_Encoder(databases, tok):
 
     def encode(dataset):
         parsed_dataset = [_generate_input(dataset[i]) for i in range(len(dataset))]
-        print(parsed_dataset[0]["source"])
         parsed_dataset = Dataset.from_list(parsed_dataset)
         encoded_dataset = parsed_dataset.map(
             _preprocess_data, remove_columns=["source", "target"]

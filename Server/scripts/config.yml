@@ -7,7 +7,7 @@ spider_validation_tables_dataset: "../spider_data/tables.json"
 spider_test_dataset: "../spider_data/test.json"
 spider_test_tables_dataset: "../spider_data/test_tables.json"
 pretrained_source_model: "google/flan-t5-large"
-model_save_location: "../google_flan-t5-large"
+model_save_location: "./models/"
 
 evaluation_steps: 8
 logging_steps: 8

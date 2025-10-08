@@ -11,11 +11,38 @@ def load_data(filepath):
         return json.load(json_file)
 
 
+def _normalize_stage_buckets(stage_dict: dict, max_stage: int):
+    """
+    Returns a list of length max_stage where missing stages are [].
+    Accepts stage_dict keyed by 0- or 1-based ints.
+    """
+    if not stage_dict:
+        return [[] for _ in range(max_stage)]
+
+    keys = list(stage_dict.keys())
+    # tolerate string keys
+    try:
+        keys = [int(k) for k in keys]
+    except Exception:
+        pass
+
+    zero_based = 0 in keys
+    out = [[] for _ in range(max_stage)]
+    for k, v in stage_dict.items():
+        k = int(k)
+        idx = k if zero_based else (k - 1)
+        if 0 <= idx < max_stage:
+            out[idx] = v
+    return out
+
+
 def _splitTrainingDataToStages(dataset):
 
     def stage_from_bits(bits):
         # Order from hardest to easiest for staging
         # Set ops > having > groupBy > order/limit > where/join > select
+        if bits[7] == "1":
+            return 6
         if bits[6] == "1":
             return 5
         if bits[3] == "1":
@@ -83,17 +110,44 @@ def load_datasets():
 
     validation_dataset = load_data(config["spider_validation_dataset"])
     validation_dataset_stages = _splitTrainingDataToStages(validation_dataset)
-    
+
     testing_dataset = load_data(config["spider_test_dataset"])
     testing_dataset_stages = _splitTrainingDataToStages(testing_dataset)
     testing_tables = load_data(config["spider_test_tables_dataset"])
+
+    all_stage_ids = set()
+    for d in (
+        training_dataset_stages,
+        validation_dataset_stages,
+        testing_dataset_stages,
+    ):
+        all_stage_ids.update(int(k) for k in d.keys())  # tolerate str keys
+    max_stage = max(all_stage_ids) if all_stage_ids else 0
+
+    # Normalize to lists with missing stages = []
+    training_dataset_stages_list = _normalize_stage_buckets(
+        training_dataset_stages, max_stage
+    )
+    validation_dataset_stages_list = _normalize_stage_buckets(
+        validation_dataset_stages, max_stage
+    )
+    testing_dataset_stages_list = _normalize_stage_buckets(
+        testing_dataset_stages, max_stage
+    )
+
+    training_tables = load_data(config["spider_training_tables_dataset"])
+    testing_tables = load_data(config["spider_test_tables_dataset"])
+
     return {
         "datasets": {
-            "training": training_dataset_stages,
-            "validation": validation_dataset_stages,
-            "testing": testing_dataset_stages,
+            "training": training_dataset_stages_list,
+            "validation": validation_dataset_stages_list,
+            "testing": testing_dataset_stages_list,
         },
-        "tables": {"training": training_tables, "testing": testing_tables},
+        "tables": {
+            "training": training_tables,
+            "testing": testing_tables,
+        },
     }
 
 

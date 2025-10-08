@@ -8,7 +8,7 @@ def clean_sql_query(s: str) -> str:
     if not s:
         return ""
     s = s.strip().rstrip(";")
-    return " ".join(s.split())
+    return " ".join(s.split()).upper()
 
 
 def db_resolver(db_id: str) -> str:
@@ -52,7 +52,7 @@ def exec_sql(db_path: str, sql: str, timeout=2.0):
         return None, None
 
 
-def make_compute_metrics(tokenizer, eval_dataset):
+def make_compute_metrics(tokenizer, eval_dataset, stage_index, get_epoch):
     pad_id = (
         tokenizer.pad_token_id
         if tokenizer.pad_token_id is not None
@@ -88,7 +88,6 @@ def make_compute_metrics(tokenizer, eval_dataset):
         exact, valid, exec_ok = [], [], []
         json_lines = []
 
-        # iterate aligned with eval_dataset (no shuffle in eval)
         for i, (p_sql, y_sql, item) in enumerate(
             zip(pred_sqls, label_sqls, eval_dataset)
         ):
@@ -111,25 +110,25 @@ def make_compute_metrics(tokenizer, eval_dataset):
             is_exec_ok = int(
                 p_cols is not None
                 and y_cols is not None
-                and p_cols == y_cols
+                and len(p_cols) == len(y_cols)
                 and p_rows == y_rows
             )
             exec_ok.append(is_exec_ok)
 
             json_lines.append(
                 {
-                    "db_path": db_path,
+                    "epoch": float(get_epoch() or 0),
                     "db_id": item.get("db_id"),
                     "prediction": p_sql,
                     "target": y_sql,
                     "prediction_valid": is_valid,
                     "exact_match": is_exact,
-                    "exec_match": is_exec_ok,
+                    "exec_match": is_exec_ok
                 }
             )
 
         # Write one JSONL block per evaluation (append)
-        with open("./eval_Results.jsonl", "a", encoding="utf-8") as f:
+        with open(f"./eval_Results_{stage_index}.jsonl", "a", encoding="utf-8") as f:
             for line in json_lines:
                 f.write(json.dumps(line, ensure_ascii=False) + "\n")
 
