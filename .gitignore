@@ -10,8 +10,6 @@ models
 __pycache__
 Logs
 Server/.venv
-Server/scripts/eval_Results.jsonl
-Server/scripts/TESTING.ipynb
-Server/scripts/models_old/
+Server/scripts/*.ipynb
 Server/scripts/*.jsonl
-Server/scripts/eval_Results_0.jsonl
+Server/scripts/compute_results/*
