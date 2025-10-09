@@ -7,6 +7,7 @@ from transformers import (
 )
 
 from compute_metrics import make_compute_metrics
+from config import Config
 
 
 class Trainer:
@@ -14,48 +15,44 @@ class Trainer:
         self,
         model,
         tokenizer,
-        config,
     ):
-        self.config = config
+        cfg = Config()
         self.model = model
         self.tokenizer = tokenizer
         self.training_args = Seq2SeqTrainingArguments(
-            output_dir="./results",
-            # ---- evaluation & saving ----
-            eval_strategy="steps",
-            eval_steps=500,
-            save_strategy="steps",
-            save_steps=1000,
-            save_total_limit=3,
-            load_best_model_at_end=True,
-            metric_for_best_model="eval_valid_sql",
-            greater_is_better=True,
-            do_eval=True,
+            # ---- output / checkpoints ----
+            output_dir=cfg.get("checkpoint_dir", "ckpt/"),
+            save_total_limit=cfg.get("save_total_limit", 3),
+            save_strategy=cfg.get("save_strategy", "steps"),
+            eval_strategy=cfg.get("eval_strategy", "steps"),
+            load_best_model_at_end=cfg.get("load_best_model_at_end", True),
+            metric_for_best_model=cfg.get("metric_for_best_model", "eval_valid_sql"),
+            greater_is_better=cfg.get("greater_is_better", True),
             # ---- optimization ----
-            learning_rate=2e-4,
-            lr_scheduler_type="cosine",
-            warmup_ratio=0.03,
-            optim="adafactor",
-            weight_decay=0.01,
-            label_smoothing_factor=0.1,
-            # ---- batches / memory ----
-            per_device_train_batch_size=4,
-            per_device_eval_batch_size=8,
-            gradient_accumulation_steps=32,  # effective batch ~128 seqs
-            gradient_checkpointing=True,
+            learning_rate=cfg.get("learning_rate", 2e-4),
+            lr_scheduler_type=cfg.get("lr_scheduler_type", "cosine"),
+            warmup_ratio=cfg.get("warmup_ratio", 0.03),
+            optim=cfg.get("optimizer", "adafactor"),
+            weight_decay=cfg.get("weight_decay", 0.01),
+            label_smoothing_factor=cfg.get("label_smoothing_factor", 0.1),
+            # ---- batching & memory ----
+            per_device_train_batch_size=cfg.get("train_batch_size", 4),
+            per_device_eval_batch_size=cfg.get("eval_batch_size", 8),
+            gradient_accumulation_steps=cfg.get("gradient_accumulation_steps", 32),
+            gradient_checkpointing=cfg.get("gradient_checkpointing", True),
             # ---- mixed precision ----
-            bf16=True,
-            # ---- generation for metrics ----
-            predict_with_generate=True,
-            generation_num_beams=6,
-            generation_max_length=256,
-            # ---- epochs/steps ----
-            num_train_epochs=10,
-            # ---- misc ----
-            logging_steps=500,
-            logging_first_step=True,
-            dataloader_num_workers=4,
-            seed=42,
+            bf16=cfg.get("bf16", True),
+            fp16=cfg.get("fp16", False), 
+            # ---- generation parameters ----
+            predict_with_generate=cfg.get("predict_with_generate", True),
+            generation_num_beams=cfg.get("generation_num_beams", 6),
+            generation_max_length=cfg.get("generation_max_length", 256),
+            # ---- training length ----
+            num_train_epochs=cfg.get("num_train_epochs", 10),
+            # ---- data loading ----
+            dataloader_num_workers=cfg.get("dataloader_num_workers", 4),
+            # ---- reproducibility ----
+            seed=cfg.get("seed", 42),
         )
         self.data_collator = DataCollatorForSeq2Seq(
             tokenizer=tokenizer, model=model, label_pad_token_id=-100

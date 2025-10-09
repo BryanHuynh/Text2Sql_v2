@@ -3,7 +3,7 @@ import sqlite3
 from time import time
 import json
 import numpy as np
-import yaml
+from config import Config
 
 
 def clean_sql_query(s: str) -> str:
@@ -56,11 +56,11 @@ def exec_sql(db_path: str, sql: str, timeout=2.0):
     except Exception:
         return None, None
     
-config = yaml.safe_load(open("config.yml"))
 
 def make_compute_metrics(
     tokenizer, eval_dataset, stage_index, get_epoch, training_database=True
 ):
+    cfg = Config()
     pad_id = (
         tokenizer.pad_token_id
         if tokenizer.pad_token_id is not None
@@ -135,7 +135,7 @@ def make_compute_metrics(
                 }
             )
 
-        out_dir = config.get("compute_results_dir")
+        out_dir = cfg.compute_results_dir
         os.makedirs(out_dir, exist_ok=True)
         filename = os.path.join(
             out_dir, f"{'eval' if training_database else 'test'}_Results_{stage_index}.jsonl"

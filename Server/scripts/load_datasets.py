@@ -1,21 +1,8 @@
 import json
 from typing import Literal, TypedDict
-import yaml
 from collections import defaultdict
 
-
-config = yaml.safe_load(open("config.yml"))
-
-
-# "datasets": {
-#     "training": training_dataset_stages_list,
-#     "validation": validation_dataset_stages_list,
-#     "testing": testing_dataset_stages_list,
-# },
-# "databases": {
-#     "training": training_databases,
-#     "testing": testing_databases,
-# },
+from config import Config
 
 
 def load_data(filepath):
@@ -116,19 +103,20 @@ def _splitDataToStages(dataset):
 
 
 def load_datasets(mode: Literal["TRAIN", "TEST"]):
+    cfg = Config()
     if mode == "TRAIN":
-        training_dataset = load_data(config["spider_training_dataset"])
+        training_dataset = load_data(cfg.spider_training_dataset)
         training_dataset_stages = _splitDataToStages(training_dataset)
     else:
         training_dataset_stages = {0: []}
-    training_databases = load_data(config["spider_training_tables_dataset"])
+    training_databases = load_data(cfg.spider_training_tables_dataset)
 
-    validation_dataset = load_data(config["spider_validation_dataset"])
+    validation_dataset = load_data(cfg.spider_validation_dataset)
     validation_dataset_stages = _splitDataToStages(validation_dataset)
 
-    testing_dataset = load_data(config["spider_test_dataset"])
+    testing_dataset = load_data(cfg.spider_test_dataset)
     testing_dataset_stages = _splitDataToStages(testing_dataset)
-    testing_databases = load_data(config["spider_test_tables_dataset"])
+    testing_databases = load_data(cfg.spider_test_tables_dataset)
 
     all_stage_ids = set()
     for d in (
@@ -150,8 +138,8 @@ def load_datasets(mode: Literal["TRAIN", "TEST"]):
         testing_dataset_stages, max_stage
     )
 
-    training_databases = load_data(config["spider_training_tables_dataset"])
-    testing_databases = load_data(config["spider_test_tables_dataset"])
+    training_databases = load_data(cfg.spider_training_tables_dataset)
+    testing_databases = load_data(cfg.spider_test_tables_dataset)
 
     return {
         "datasets": {
