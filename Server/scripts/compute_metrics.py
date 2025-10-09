@@ -1,7 +1,9 @@
+import os
 import sqlite3
 from time import time
 import json
 import numpy as np
+import yaml
 
 
 def clean_sql_query(s: str) -> str:
@@ -11,8 +13,11 @@ def clean_sql_query(s: str) -> str:
     return " ".join(s.split()).upper()
 
 
-def db_resolver(db_id: str) -> str:
-    return f"../spider_data/database/{db_id}/{db_id}.sqlite"
+def db_resolver(db_id: str, training) -> str:
+    if training:
+        return f"../spider_data/database/{db_id}/{db_id}.sqlite"
+    else:
+        return f"../spider_data/test_database/{db_id}/{db_id}.sqlite"
 
 
 def _normalize_result(cols, rows):
@@ -50,9 +55,12 @@ def exec_sql(db_path: str, sql: str, timeout=2.0):
         return _normalize_result(cols, rows)
     except Exception:
         return None, None
+    
+config = yaml.safe_load(open("config.yml"))
 
-
-def make_compute_metrics(tokenizer, eval_dataset, stage_index, get_epoch):
+def make_compute_metrics(
+    tokenizer, eval_dataset, stage_index, get_epoch, training_database=True
+):
     pad_id = (
         tokenizer.pad_token_id
         if tokenizer.pad_token_id is not None
@@ -91,7 +99,7 @@ def make_compute_metrics(tokenizer, eval_dataset, stage_index, get_epoch):
         for i, (p_sql, y_sql, item) in enumerate(
             zip(pred_sqls, label_sqls, eval_dataset)
         ):
-            db_path = db_resolver(item["db_id"])
+            db_path = db_resolver(item["db_id"], training_database)
 
             # exact match (string)
             is_exact = int(p_sql == y_sql)
@@ -123,12 +131,16 @@ def make_compute_metrics(tokenizer, eval_dataset, stage_index, get_epoch):
                     "target": y_sql,
                     "prediction_valid": is_valid,
                     "exact_match": is_exact,
-                    "exec_match": is_exec_ok
+                    "exec_match": is_exec_ok,
                 }
             )
 
-        # Write one JSONL block per evaluation (append)
-        with open(f"./eval_Results_{stage_index}.jsonl", "a", encoding="utf-8") as f:
+        out_dir = config.get("compute_results_dir")
+        os.makedirs(out_dir, exist_ok=True)
+        filename = os.path.join(
+            out_dir, f"{'eval' if training_database else 'test'}_Results_{stage_index}.jsonl"
+        )
+        with open(filename, "a", encoding="utf-8") as f:
             for line in json_lines:
                 f.write(json.dumps(line, ensure_ascii=False) + "\n")
 
