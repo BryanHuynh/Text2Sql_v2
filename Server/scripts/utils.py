@@ -1,7 +1,6 @@
-from distutils.command import config
 import os
 import re
-from typing import TypedDict
+from config import Config
 
 from flask import json
 import numpy as np
@@ -117,15 +116,16 @@ def format_source(question, db_name, schema):
     return f"{question} | {db_name} | {schema}"
 
 
-def get_latest_model_and_tokenizer(config):
+def get_latest_model_and_tokenizer():
+    config = Config()
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch.cuda.empty_cache()
     if device == "cuda":
         torch.backends.cudnn.benchmark = True
 
-    models_dir = config.get("model_save_location")
+    models_dir = config.model_save_location
     last_stage_idx, ckpt = latest_model_stage(models_dir)
-    pretrained_model = ckpt if ckpt else config.get("pretrained_source_model")
+    pretrained_model = ckpt if ckpt else config.pretrained_source_model
     print(f"using model: {pretrained_model}")
 
     tokenizer = AutoTokenizer.from_pretrained(pretrained_model)

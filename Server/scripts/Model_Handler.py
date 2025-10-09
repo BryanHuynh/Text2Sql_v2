@@ -5,16 +5,17 @@ import os
 import torch
 from encoder import Resolve_Encoder
 from Trainer import Trainer
+from config import Config
 from utils import delete_metric_results, format_source, get_latest_model_and_tokenizer
 
 
 class Model_Handler:
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
+        self.cfg = Config()
 
     def _load_model_and_tokenizer(self):
         self.tokenizer, self.model, self.last_stage_idx, self.device = (
-            get_latest_model_and_tokenizer(self.config)
+            get_latest_model_and_tokenizer()
         )
 
     def train(self, datasets):
@@ -29,7 +30,7 @@ class Model_Handler:
             print("[INFO] All stages already completed.")
             raise SystemExit(0)
 
-        delete_metric_results(self.config.get("compute_results_dir"), start=start_stage)
+        delete_metric_results(self.cfg.compute_results_dir, start=start_stage)
 
         training_encoder = Resolve_Encoder(
             datasets["databases"]["training"], self.tokenizer, self.device
@@ -49,12 +50,12 @@ class Model_Handler:
             )
             evaluation_data = training_encoder(eval_slices)
 
-            trainer = Trainer(self.model, self.tokenizer, self.config)
+            trainer = Trainer(self.model, self.tokenizer)
             self.model, self.tokenizer = trainer.train(
                 training_data, evaluation_data, stage_index
             )
             save_dir = os.path.join(
-                self.config.get("model_save_location", "models/"),
+                self.cfg.get("model_save_location", "models/"),
                 f"model-Stage_{stage_index}",
             )
             self.model.save_pretrained(save_dir)
@@ -73,7 +74,7 @@ class Model_Handler:
         for stage_index in range(num_stages):
             data_slices = list(chain.from_iterable(dataset[: stage_index + 1]))
             encoded_data = encoder(data_slices)
-            trainer = Trainer(self.model, self.tokenizer, self.config)
+            trainer = Trainer(self.model, self.tokenizer)
             stage_results.append(
                 trainer.evaluate(encoded_data, stage_index, is_training_database)
             )

@@ -1,19 +1,10 @@
 from enum import Enum
 from matplotlib.pylab import ceil
-from transformers import (
-    AutoConfig,
-    AutoTokenizer,
-)
-from transformers import (
-    AutoModelForSeq2SeqLM,
-)
-import torch
-import yaml
-import matplotlib.pyplot as plt
 from load_datasets import load_datasets
 from Model_Handler import Model_Handler
 
 from plot_results import plot_epoch_results
+from config import Config
 from utils import create_schema, delete_metric_results, summarize_results
 
 
@@ -53,24 +44,22 @@ def main(mode: Mode, query_payload: QueryPayload = None):
     ):
         raise TypeError(f"mode is query but query is malformed or missing")
 
-    config = yaml.safe_load(open("config.yml"))
+    cfg = Config()
 
-    model_handler = Model_Handler(config)
+    model_handler = Model_Handler()
     if mode == Mode.TRAIN:
         loaded_datasets = load_datasets("TRAIN")
         model_handler.train(loaded_datasets)
     elif mode == Mode.TEST:
-        compute_results_dir = config.get("compute_results_dir")
+        compute_results_dir = cfg.compute_results_dir
         delete_metric_results(compute_results_dir)
         loaded_datasets = load_datasets("TEST")
         model_handler.test(loaded_datasets)
         results = summarize_results(compute_results_dir)
         plot_epoch_results(results["eval"], results["test"], compute_results_dir)
     elif mode == Mode.GRAPH:
-        results = summarize_results(config.get("compute_results_dir"))
-        plot_epoch_results(
-            results["eval"], results["test"], config.get("compute_results_dir")
-        )
+        results = summarize_results(cfg.compute_results_dir)
+        plot_epoch_results(results["eval"], results["test"], cfg.compute_results_dir)
     elif mode == Mode.QUERY:
         result = model_handler.query(
             query_payload.database_name,

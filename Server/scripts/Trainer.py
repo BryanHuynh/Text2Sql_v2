@@ -7,6 +7,7 @@ from transformers import (
 )
 
 from compute_metrics import make_compute_metrics
+from config import Config
 
 
 class Trainer:
@@ -14,9 +15,8 @@ class Trainer:
         self,
         model,
         tokenizer,
-        config,
     ):
-        self.config = config
+        self.cfg = Config()
         self.model = model
         self.tokenizer = tokenizer
         self.training_args = Seq2SeqTrainingArguments(
