@@ -2,7 +2,7 @@ from utils import create_schema, format_source
 from datasets import Dataset
 
 
-def Resolve_Encoder(databases, tok, device):
+def Resolve_Encoder(databases, tok, device, db_path):
 
     def _generate_database_index(databases):
         index_dictionary = {}
@@ -12,15 +12,15 @@ def Resolve_Encoder(databases, tok, device):
 
     database_indexes = _generate_database_index(databases)
 
-    def _generate_schema(db_id: str):
+    def _generate_schema(db_id: str, question: str):
         database = databases[database_indexes[db_id]]
-        return create_schema(database)
+        return create_schema(database, db_path=db_path, question=question)
 
     def _generate_input(entry):
         question = entry["question"]
         target = entry["query"]
         db_id = entry["db_id"]
-        schema = _generate_schema(db_id)
+        schema = _generate_schema(db_id, question)
         source = format_source(question, db_id, schema)
         return {
             "db_id": db_id,

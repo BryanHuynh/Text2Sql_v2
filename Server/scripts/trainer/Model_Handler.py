@@ -3,8 +3,8 @@ from itertools import chain
 import os
 
 import torch
-from encoder import Resolve_Encoder
-from Trainer import Trainer
+from trainer.encoder import Resolve_Encoder
+from trainer.Trainer import Trainer
 from config import Config
 from utils import delete_metric_results, format_source, get_latest_model_and_tokenizer
 
@@ -33,7 +33,10 @@ class Model_Handler:
         delete_metric_results(self.cfg.compute_results_dir, start=start_stage)
 
         training_encoder = Resolve_Encoder(
-            datasets["databases"]["training"], self.tokenizer, self.device
+            datasets["databases"]["training"],
+            self.tokenizer,
+            self.device,
+            self.cfg.spider_database_dir,
         )
         for stage_index in range(start_stage, num_stages):
             self._load_model_and_tokenizer()
@@ -59,7 +62,6 @@ class Model_Handler:
                 f"model-Stage_{stage_index}",
             )
             self.model.save_pretrained(save_dir)
-            self.tokenizer.save_pretrained(save_dir)
 
             del trainer
             gc.collect()
@@ -83,10 +85,16 @@ class Model_Handler:
     def test(self, datasets):
         self._load_model_and_tokenizer()
         validation_encoder = Resolve_Encoder(
-            datasets["databases"]["training"], self.tokenizer, self.device
+            datasets["databases"]["training"],
+            self.tokenizer,
+            self.device,
+            self.cfg.spider_database_dir,
         )
         testing_encoder = Resolve_Encoder(
-            datasets["databases"]["testing"], self.tokenizer, self.device
+            datasets["databases"]["testing"],
+            self.tokenizer,
+            self.device,
+            self.cfg.spider_database_test_dir,
         )
         evaluation_stage_results = self.test_individual_dataset(
             datasets["datasets"]["validation"], validation_encoder
@@ -98,9 +106,31 @@ class Model_Handler:
 
     def query(self, database_name: str, formated_schema: str, question: str):
         self._load_model_and_tokenizer()
+        self.model.eval()
+
         source = format_source(question, database_name, formated_schema)
-        input = self.tokenizer(
-            source, truncation=True, padding=False, return_tensors="pt"
-        )
-        output = self.model.generate(**input)
-        return self.tokenizer.decode(output[0], skip_special_tokens=True)
+        inputs = self.tokenizer(
+            source,
+            return_tensors="pt",
+            truncation=True,
+            max_length=min(
+                getattr(self.tokenizer, "model_max_length", 1024),
+                getattr(self.model.config, "max_position_embeddings", 1024) or 1024,
+            ),
+            padding=False,
+        ).to(self.device)
+
+        with torch.no_grad():
+            output = self.model.generate(
+                **inputs,
+                max_new_tokens=256,
+                min_new_tokens=8,
+                num_beams=6,
+                early_stopping=True,
+                length_penalty=0.0,
+                no_repeat_ngram_size=3,
+                return_dict_in_generate=True,
+                output_scores=False,
+            )
+
+        return self.tokenizer.decode(output.sequences[0], skip_special_tokens=True)

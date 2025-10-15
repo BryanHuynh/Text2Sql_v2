@@ -1,11 +1,14 @@
 from enum import Enum
-from matplotlib.pylab import ceil
-from load_datasets import load_datasets
-from Model_Handler import Model_Handler
+from trainer.load_datasets import load_datasets
+from trainer.Model_Handler import Model_Handler
 
-from plot_results import plot_epoch_results
 from config import Config
-from utils import create_schema, delete_metric_results, summarize_results
+from utils import (
+    create_schema,
+    delete_metric_results,
+    summarize_results,
+    plot_epoch_results,
+)
 
 
 class Mode(Enum):
@@ -70,4 +73,36 @@ def main(mode: Mode, query_payload: QueryPayload = None):
 
 
 if __name__ == "__main__":
-    main(Mode.TEST)
+    payload = QueryPayload(
+        "get all warehouses with capacity > 50",
+        "warehouse_1",
+        {
+            "column_names_original": [
+                [-1, "*"],
+                [0, "Code"],
+                [0, "Location"],
+                [0, "Capacity"],
+                [1, "Code"],
+                [1, "Contents"],
+                [1, "Value"],
+                [1, "Warehouse"],
+            ],
+            "column_types": [
+                "text",
+                "number",
+                "text",
+                "number",
+                "text",
+                "text",
+                "number",
+                "number",
+            ],
+            "table_names_original": ["Warehouses", "Boxes"],
+            "foreign_keys": [[7, 1]],
+            "primary_keys": [1, 4],
+            "db_id": "warehouse_1",
+        },
+    )
+    result = main(Mode.QUERY, query_payload=payload)
+    print(result)
+    # main(Mode.Q)
