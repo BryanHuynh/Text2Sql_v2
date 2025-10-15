@@ -6,7 +6,7 @@ from transformers import (
     Seq2SeqTrainingArguments,
 )
 
-from compute_metrics import make_compute_metrics
+from trainer.compute_metrics import make_compute_metrics
 from config import Config
 
 
@@ -29,12 +29,12 @@ class Trainer:
             metric_for_best_model=cfg.get("metric_for_best_model", "eval_valid_sql"),
             greater_is_better=cfg.get("greater_is_better", True),
             # ---- optimization ----
-            learning_rate=cfg.get("learning_rate", 2e-4),
+            learning_rate=float(cfg.get("learning_rate", 2e-4)),
             lr_scheduler_type=cfg.get("lr_scheduler_type", "cosine"),
-            warmup_ratio=cfg.get("warmup_ratio", 0.03),
-            optim=cfg.get("optimizer", "adafactor"),
-            weight_decay=cfg.get("weight_decay", 0.01),
-            label_smoothing_factor=cfg.get("label_smoothing_factor", 0.1),
+            warmup_ratio=float(cfg.get("warmup_ratio", 0.03)),
+            optim=cfg.get("optim", cfg.get("optimizer", "adafactor")),
+            weight_decay=float(cfg.get("weight_decay", 0.01)),
+            label_smoothing_factor=float(cfg.get("label_smoothing_factor", 0.1)),
             # ---- batching & memory ----
             per_device_train_batch_size=cfg.get("train_batch_size", 4),
             per_device_eval_batch_size=cfg.get("eval_batch_size", 8),
@@ -53,6 +53,7 @@ class Trainer:
             dataloader_num_workers=cfg.get("dataloader_num_workers", 4),
             # ---- reproducibility ----
             seed=cfg.get("seed", 42),
+            
         )
         self.data_collator = DataCollatorForSeq2Seq(
             tokenizer=tokenizer, model=model, label_pad_token_id=-100

@@ -1,5 +1,5 @@
 import json
-from typing import Literal, TypedDict
+from typing import Literal
 from collections import defaultdict
 
 from config import Config
