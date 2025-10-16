@@ -14,3 +14,4 @@ Server/scripts/*.ipynb
 Server/scripts/*.jsonl
 Server/scripts/compute_results/*
 Server/scripts/ckpt/*
+Server/queue/

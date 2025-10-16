@@ -16,6 +16,7 @@ class Mode(Enum):
     TEST = "test"
     QUERY = "query"
     GRAPH = "graph"
+    MONITOR = "monitor"
 
     @staticmethod
     def from_str(label: str):
@@ -39,6 +40,7 @@ class QueryPayload:
 
 
 def main(mode: Mode, query_payload: QueryPayload = None):
+    cfg = Config()
     if not isinstance(mode, Mode):
         raise TypeError(f"mode must be a member of Mode enum, got {mode!r}")
 
@@ -46,8 +48,6 @@ def main(mode: Mode, query_payload: QueryPayload = None):
         query_payload == None or not isinstance(query_payload, QueryPayload)
     ):
         raise TypeError(f"mode is query but query is malformed or missing")
-
-    cfg = Config()
 
     model_handler = Model_Handler()
     if mode == Mode.TRAIN:
@@ -70,39 +70,9 @@ def main(mode: Mode, query_payload: QueryPayload = None):
             query_payload.question,
         )
         return result
+    elif mode == Mode.MONITOR:
+        pass
 
 
 if __name__ == "__main__":
-    payload = QueryPayload(
-        "get all warehouses with capacity > 50",
-        "warehouse_1",
-        {
-            "column_names_original": [
-                [-1, "*"],
-                [0, "Code"],
-                [0, "Location"],
-                [0, "Capacity"],
-                [1, "Code"],
-                [1, "Contents"],
-                [1, "Value"],
-                [1, "Warehouse"],
-            ],
-            "column_types": [
-                "text",
-                "number",
-                "text",
-                "number",
-                "text",
-                "text",
-                "number",
-                "number",
-            ],
-            "table_names_original": ["Warehouses", "Boxes"],
-            "foreign_keys": [[7, 1]],
-            "primary_keys": [1, 4],
-            "db_id": "warehouse_1",
-        },
-    )
-    result = main(Mode.QUERY, query_payload=payload)
-    print(result)
-    # main(Mode.Q)
+    main(Mode.MONITOR)

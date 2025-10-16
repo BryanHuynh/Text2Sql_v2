@@ -33,7 +33,6 @@ def get_latest_model_and_tokenizer():
     models_dir = config.model_save_location
     last_stage_idx, ckpt = latest_model_stage(models_dir)
     pretrained_model = ckpt if ckpt else config.pretrained_source_model
-    print(f"using model: {pretrained_model}")
 
     tokenizer = AutoTokenizer.from_pretrained(pretrained_model)
     cfg = AutoConfig.from_pretrained(pretrained_model)

@@ -12,6 +12,7 @@ from utils import delete_metric_results, format_source, get_latest_model_and_tok
 class Model_Handler:
     def __init__(self):
         self.cfg = Config()
+        self._load_model_and_tokenizer()
 
     def _load_model_and_tokenizer(self):
         self.tokenizer, self.model, self.last_stage_idx, self.device = (
@@ -20,8 +21,6 @@ class Model_Handler:
 
     def train(self, datasets):
         num_stages = len(datasets["datasets"]["training"])
-
-        self._load_model_and_tokenizer()
         start_stage = (
             (self.last_stage_idx + 1) if self.last_stage_idx is not None else 0
         )
@@ -83,7 +82,6 @@ class Model_Handler:
         return stage_results
 
     def test(self, datasets):
-        self._load_model_and_tokenizer()
         validation_encoder = Resolve_Encoder(
             datasets["databases"]["training"],
             self.tokenizer,
@@ -105,7 +103,6 @@ class Model_Handler:
         return evaluation_stage_results, test_stage_results
 
     def query(self, database_name: str, formated_schema: str, question: str):
-        self._load_model_and_tokenizer()
         self.model.eval()
 
         source = format_source(question, database_name, formated_schema)
