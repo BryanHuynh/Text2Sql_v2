@@ -1,10 +1,11 @@
 from enum import Enum
+from Monitor import Monitor
+from utils import QueryPayload
 from trainer.load_datasets import load_datasets
 from trainer.Model_Handler import Model_Handler
 
 from config import Config
 from utils import (
-    create_schema,
     delete_metric_results,
     summarize_results,
     plot_epoch_results,
@@ -30,13 +31,6 @@ class Mode(Enum):
         raise ValueError(
             f"Invalid mode: {label}. Valid options are {[m.value for m in Mode]}"
         )
-
-
-class QueryPayload:
-    def __init__(self, question, database_name, schema_json):
-        self.question = question
-        self.database_name = database_name
-        self.formatted_schema = create_schema(schema_json)
 
 
 def main(mode: Mode, query_payload: QueryPayload = None):
@@ -71,7 +65,8 @@ def main(mode: Mode, query_payload: QueryPayload = None):
         )
         return result
     elif mode == Mode.MONITOR:
-        pass
+        monitor = Monitor(model_handler)
+        monitor.start()
 
 
 if __name__ == "__main__":

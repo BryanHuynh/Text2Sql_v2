@@ -129,5 +129,8 @@ class Model_Handler:
                 return_dict_in_generate=True,
                 output_scores=False,
             )
+        decoded = self.tokenizer.decode(output.sequences[0], skip_special_tokens=True)
+        del inputs, output
+        torch.cuda.empty_cache()
 
-        return self.tokenizer.decode(output.sequences[0], skip_special_tokens=True)
+        return decoded
